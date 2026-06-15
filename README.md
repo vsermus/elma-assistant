@@ -89,7 +89,7 @@ Telegram-бот
 
 **1. Клонировать репозиторий**
 ```bash
-git clone https://github.com/ViktorSermus/elma-assistant.git
+git clone https://github.com/vsermus/elma-assistant.git
 cd elma-assistant
 ```
 
@@ -166,4 +166,4 @@ ELMA_Connector/
 ## Автор
 
 **Виктор Ермус** — аналитик данных  
-GitHub: [ViktorSermus](https://github.com/ViktorSermus)
+GitHub: [vsermus](https://github.com/vsermus)
