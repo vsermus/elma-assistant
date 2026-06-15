@@ -1,0 +1,36 @@
+{
+  "app_name": "ELMA Bot",
+  "version": "0.1.0",
+  "data": {
+    "base_path": "../data",
+    "entities_config": "../config/entities.json",
+    "auto_refresh_hours": 24
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 5000,
+    "debug": true
+  },
+  "agents": {
+    "kmd": {
+      "name": "КМД агент",
+      "enabled": true,
+      "entities": ["zadanie_na_kmd", "kartochka_vitrazha_po_km", "order_by_kmd", "zns_po_kmd", "ozm"]
+    },
+    "tender": {
+      "name": "Тендерный агент",
+      "enabled": true,
+      "entities": ["tender", "raboty_po_tenderu", "spravochnik_id"]
+    },
+    "excel": {
+      "name": "Excel агент",
+      "enabled": true,
+      "template_path": "../reports"
+    },
+    "directory": {
+      "name": "Справочный агент",
+      "enabled": true,
+      "entities": ["_companies", "users", "spravochnik_id", "statusy_rabot_po_tenderam", "statusy_order_by_kmd"]
+    }
+  }
+}

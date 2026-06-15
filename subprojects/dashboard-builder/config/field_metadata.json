@@ -1,0 +1,2178 @@
+[
+  {
+    "id": "raboty_po_tenderu",
+    "name": "Работы по тендеру",
+    "description": "Полный перечень работ по всем тендерам с указанием площади, сумм, типа работ (монтаж, поставка, проектирование и т.д.), статуса выполнения, ответственных в ТЭО и привязкой к объекту",
+    "fields": [
+      {
+        "key": "id",
+        "name": "ID работы",
+        "type": "link"
+      },
+      {
+        "key": "__id",
+        "name": "ID записи",
+        "type": "dimension"
+      },
+      {
+        "key": "__name",
+        "name": "Название работы",
+        "type": "dimension"
+      },
+      {
+        "key": "dvu_m2",
+        "name": "ДВУ за м²",
+        "type": "metric"
+      },
+      {
+        "key": "tender",
+        "name": "Ссылка на тендер",
+        "type": "link",
+        "linkTo": "tender"
+      },
+      {
+        "key": "__debug",
+        "name": "Отладка",
+        "type": "skip"
+      },
+      {
+        "key": "__index",
+        "name": "Индекс",
+        "type": "skip"
+      },
+      {
+        "key": "__tasks",
+        "name": "Задачи",
+        "type": "link"
+      },
+      {
+        "key": "cena_m2",
+        "name": "Цена за м²",
+        "type": "metric"
+      },
+      {
+        "key": "montazh",
+        "name": "Монтаж",
+        "type": "metric"
+      },
+      {
+        "key": "__status",
+        "name": "Статус",
+        "type": "skip"
+      },
+      {
+        "key": "faily_ar",
+        "name": "Файлы АР",
+        "type": "link"
+      },
+      {
+        "key": "faily_tz",
+        "name": "Файлы ТЗ",
+        "type": "link"
+      },
+      {
+        "key": "__version",
+        "name": "Версия",
+        "type": "metric"
+      },
+      {
+        "key": "ankera_m2",
+        "name": "Анкера за м²",
+        "type": "metric"
+      },
+      {
+        "key": "materialy",
+        "name": "Материалы",
+        "type": "metric"
+      },
+      {
+        "key": "metizy_m2",
+        "name": "Метизы за м²",
+        "type": "metric"
+      },
+      {
+        "key": "profil_m2",
+        "name": "Профиль за м²",
+        "type": "metric"
+      },
+      {
+        "key": "tip_rabot",
+        "name": "Типы работ",
+        "type": "link"
+      },
+      {
+        "key": "zakazchik",
+        "name": "Заказчик",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "id_proekta",
+        "name": "ID проекта",
+        "type": "dimension"
+      },
+      {
+        "key": "kontragent",
+        "name": "Контрагент",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "kvadratura",
+        "name": "Площадь, м²",
+        "type": "metric"
+      },
+      {
+        "key": "montazh_m2",
+        "name": "Монтаж за м²",
+        "type": "metric"
+      },
+      {
+        "key": "__createdAt",
+        "name": "Дата создания",
+        "type": "date"
+      },
+      {
+        "key": "__createdBy",
+        "name": "Создатель",
+        "type": "dimension"
+      },
+      {
+        "key": "__deletedAt",
+        "name": "Дата удаления",
+        "type": "date"
+      },
+      {
+        "key": "__directory",
+        "name": "Директория",
+        "type": "skip"
+      },
+      {
+        "key": "__updatedAt",
+        "name": "Дата изменения",
+        "type": "date"
+      },
+      {
+        "key": "__updatedBy",
+        "name": "Редактор",
+        "type": "dimension"
+      },
+      {
+        "key": "faily_iz_os",
+        "name": "Файлы из ОС",
+        "type": "link"
+      },
+      {
+        "key": "zarplata_m2",
+        "name": "Зарплата за м²",
+        "type": "metric"
+      },
+      {
+        "key": "__externalId",
+        "name": "Внешний ID",
+        "type": "skip"
+      },
+      {
+        "key": "furnitura_m2",
+        "name": "Фурнитура за м²",
+        "type": "metric"
+      },
+      {
+        "key": "geodeziya_m2",
+        "name": "Геодезия за м²",
+        "type": "metric"
+      },
+      {
+        "key": "id_proekta_1",
+        "name": "ID объекта",
+        "type": "link",
+        "linkTo": "spravochnik_id"
+      },
+      {
+        "key": "materialy_m2",
+        "name": "Материалы за м²",
+        "type": "metric"
+      },
+      {
+        "key": "__subscribers",
+        "name": "Подписчики",
+        "type": "link"
+      },
+      {
+        "key": "aksessuary_m2",
+        "name": "Аксессуары за м²",
+        "type": "metric"
+      },
+      {
+        "key": "reklamacii_m2",
+        "name": "Рекламации за м²",
+        "type": "metric"
+      },
+      {
+        "key": "faily_s_cenami",
+        "name": "Файлы с ценами",
+        "type": "link"
+      },
+      {
+        "key": "kommentarii_ds",
+        "name": "Комментарий ДС",
+        "type": "dimension"
+      },
+      {
+        "key": "kommentarii_mo",
+        "name": "Комментарий МО",
+        "type": "dimension"
+      },
+      {
+        "key": "kommentarii_os",
+        "name": "Комментарий ОС",
+        "type": "dimension"
+      },
+      {
+        "key": "kronshteiny_v2",
+        "name": "Кронштейны за м²",
+        "type": "metric"
+      },
+      {
+        "key": "primykaniya_m2",
+        "name": "Примыкания за м²",
+        "type": "metric"
+      },
+      {
+        "key": "rukovoditel_sd",
+        "name": "Руководитель Строительной Дирекции",
+        "type": "link"
+      },
+      {
+        "key": "iniciator_rabot",
+        "name": "Инициатор работ",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "izgotovlenie_m2",
+        "name": "Изготовление за м²",
+        "type": "metric"
+      },
+      {
+        "key": "osobye_usloviya",
+        "name": "Особые условия",
+        "type": "dimension"
+      },
+      {
+        "key": "subpodryadchiki",
+        "name": "Субподрядчики",
+        "type": "metric"
+      },
+      {
+        "key": "summa_kontrakta",
+        "name": "Сумма контракта",
+        "type": "metric"
+      },
+      {
+        "key": "transportnye_m2",
+        "name": "Транспортные за м²",
+        "type": "metric"
+      },
+      {
+        "key": "data_okonchaniya",
+        "name": "Дата окончания",
+        "type": "date"
+      },
+      {
+        "key": "genpodryadnye_m2",
+        "name": "Генподрядные за м²",
+        "type": "metric"
+      },
+      {
+        "key": "prochie_raskhody",
+        "name": "Прочие расходы",
+        "type": "metric"
+      },
+      {
+        "key": "rezultat_tendera",
+        "name": "Результат тендера",
+        "type": "dimension"
+      },
+      {
+        "key": "vypolnit_raschet",
+        "name": "Выполнить расчёт",
+        "type": "link"
+      },
+      {
+        "key": "germetiki_klei_m2",
+        "name": "Герметики/клей за м²",
+        "type": "metric"
+      },
+      {
+        "key": "iniciator_rabot_1",
+        "name": "Инициатор работ",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "itogo_raskhody_m2",
+        "name": "Итого расходы за м²",
+        "type": "metric"
+      },
+      {
+        "key": "pobeditel_tendera",
+        "name": "Победитель тендера",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "proektirovanie_m2",
+        "name": "Проектирование за м²",
+        "type": "metric"
+      },
+      {
+        "key": "proforma_dogovora",
+        "name": "Проформа договора",
+        "type": "link"
+      },
+      {
+        "key": "__tasks_performers",
+        "name": "Исполнители задач",
+        "type": "link"
+      },
+      {
+        "key": "data_nachala_rabot",
+        "name": "Дата начала работ",
+        "type": "date"
+      },
+      {
+        "key": "faily_dlya_tendera",
+        "name": "faily dlya tendera",
+        "type": "link"
+      },
+      {
+        "key": "kontakty_po_obektu",
+        "name": "Контакты по объекту",
+        "type": "dimension"
+      },
+      {
+        "key": "nasha_organizaciya",
+        "name": "Наша организация",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "subpodryadchiki_m2",
+        "name": "Субподрядчики за м²",
+        "type": "metric"
+      },
+      {
+        "key": "tendernyi_byudzhet",
+        "name": "Тендерный бюджет",
+        "type": "link"
+      },
+      {
+        "key": "otvetstvennyi_v_teo",
+        "name": "Ответственный в ТЭО",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "prochie_raskhody_m2",
+        "name": "Прочие расходы за м²",
+        "type": "metric"
+      },
+      {
+        "key": "rukovoditel_proekta",
+        "name": "Руководитель проекта (РП)",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "data_nachala_rabot_1",
+        "name": "Дата начала работ (2)",
+        "type": "date"
+      },
+      {
+        "key": "faily_predv_rascheta",
+        "name": "Файлы предв. расчёта",
+        "type": "link"
+      },
+      {
+        "key": "podsobnye_rabochiem2",
+        "name": "Подсобные рабочие за м²",
+        "type": "metric"
+      },
+      {
+        "key": "tualetnye_kabinki_m2",
+        "name": "Туалетные кабинки за м²",
+        "type": "metric"
+      },
+      {
+        "key": "__externalProcessMeta",
+        "name": "Метаданные процесса",
+        "type": "skip"
+      },
+      {
+        "key": "kratkoe_nazvanie_obekta",
+        "name": "Объект (кратко)",
+        "type": "dimension"
+      },
+      {
+        "key": "protokol_itogov_tendera",
+        "name": "Протокол итогов тендера",
+        "type": "link"
+      },
+      {
+        "key": "raskhodnye_materialy_m2",
+        "name": "Расходные материалы за м²",
+        "type": "metric"
+      },
+      {
+        "key": "sdacha_sks_dolshikam_m2",
+        "name": "Сдача СКС дольщикам за м²",
+        "type": "metric"
+      },
+      {
+        "key": "uslugi_podryadchikov_m2",
+        "name": "Услуги подрядчиков за м²",
+        "type": "metric"
+      },
+      {
+        "key": "__tasks_earliest_duedate",
+        "name": "Ранний срок задач",
+        "type": "date"
+      },
+      {
+        "key": "stroitelnyi_adres_obekta",
+        "name": "Адрес объекта",
+        "type": "dimension"
+      },
+      {
+        "key": "konsultacionnye_uslugi_m2",
+        "name": "Консультационные за м²",
+        "type": "metric"
+      },
+      {
+        "key": "srok_nachala_stroitelstva",
+        "name": "Срок начала строительства",
+        "type": "date"
+      },
+      {
+        "key": "vypolnit_proverku_proekta",
+        "name": "Проверка проекта",
+        "type": "dimension"
+      },
+      {
+        "key": "proektirovanie_i_geodeziya",
+        "name": "Проектирование и геодезия",
+        "type": "metric"
+      },
+      {
+        "key": "raskhody_na_prozhivanie_m2",
+        "name": "Проживание за м²",
+        "type": "metric"
+      },
+      {
+        "key": "dokhod_ot_okazaniya_uslug_m2",
+        "name": "Доход от услуг за м²",
+        "type": "metric"
+      },
+      {
+        "key": "garantiinoe_obsluzhivanie_m2",
+        "name": "Гарантийное обслуживание за м²",
+        "type": "metric"
+      },
+      {
+        "key": "genpodryadnye_vozmeshenie_m2",
+        "name": "Возмещение генподрядных за м²",
+        "type": "metric"
+      },
+      {
+        "key": "komandirovochnye_raskhody_m2",
+        "name": "Командировочные за м²",
+        "type": "metric"
+      },
+      {
+        "key": "predstavitelskie_raskhody_m2",
+        "name": "Представительские за м²",
+        "type": "metric"
+      },
+      {
+        "key": "raskhody_sverkh_byudzheta_m2",
+        "name": "Расходы сверх бюджета за м²",
+        "type": "metric"
+      },
+      {
+        "key": "dvu_stoimost_kreditovaniya_m2",
+        "name": "ДВУ стоимость кредит. за м²",
+        "type": "metric"
+      },
+      {
+        "key": "proektirovanie_i_geodeziya_m2",
+        "name": "Проектирование и геодезия за м²",
+        "type": "metric"
+      },
+      {
+        "key": "zarplata_premialnaya_chast_m2",
+        "name": "Премиальная часть ЗП за м²",
+        "type": "metric"
+      },
+      {
+        "key": "arenda_stroitelnoi_tekhniki_m2",
+        "name": "Аренда техники за м²",
+        "type": "metric"
+      },
+      {
+        "key": "proizvodstvennyi_instrument_m2",
+        "name": "Производственный инструмент за м²",
+        "type": "metric"
+      },
+      {
+        "key": "rukovoditel_montazhnogo_otdela",
+        "name": "Руководитель монтажного отдела",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "uslugi_kliningovoi_kompanii_m2",
+        "name": "Клининг за м²",
+        "type": "metric"
+      },
+      {
+        "key": "raskhody_na_poluchenie_sredstv_m2",
+        "name": "Расходы на получение средств за м²",
+        "type": "metric"
+      },
+      {
+        "key": "vyvoz_musora_i_promyshl_otkhodov_m2",
+        "name": "Вывоз мусора за м²",
+        "type": "metric"
+      },
+      {
+        "key": "dok_obespechenie_stroitelstva_ppr_m2",
+        "name": "Док. обеспечение стр. за м²",
+        "type": "metric"
+      },
+      {
+        "key": "dvu_dok_obespechenie_stroitelstva_m2",
+        "name": "ДВУ обеспечение стр. за м²",
+        "type": "metric"
+      },
+      {
+        "key": "neobkhodimost_proverki_obyomov_rabot",
+        "name": "Проверка объёмов работ",
+        "type": "dimension"
+      },
+      {
+        "key": "okhrana_truda_i_tekhnika_bezopasnosti_m2",
+        "name": "Охрана труда за м²",
+        "type": "metric"
+      },
+      {
+        "key": "predpolagaemaya_data_okonchaniya_stroitelstva",
+        "name": "Предп. дата окончания",
+        "type": "date"
+      },
+      {
+        "key": "skvoznoi_kommentarii_v_osnovnoi_forme_tendera",
+        "name": "Сквозной комментарий",
+        "type": "dimension"
+      },
+      {
+        "key": "faily_raschetov_s_ponizhenizhennoi_marzhinalnostyu",
+        "name": "Файлы расчётов с пониж. марж.",
+        "type": "link"
+      }
+    ]
+  },
+  {
+    "id": "tender",
+    "name": "Тендеры",
+    "description": "Все тендеры компании с информацией о статусе, заказчике, объекте строительства, датах проведения, ответственных лицах (руководитель проекта, инициатор работ, руководитель СД, ответственный в ТЭО)",
+    "fields": [
+      {
+        "key": "dvu",
+        "name": "ДВУ",
+        "type": "metric"
+      },
+      {
+        "key": "__id",
+        "name": "ID тендера",
+        "type": "dimension"
+      },
+      {
+        "key": "city",
+        "name": "Город",
+        "type": "link"
+      },
+      {
+        "key": "__name",
+        "name": "Название тендера",
+        "type": "dimension"
+      },
+      {
+        "key": "ankera",
+        "name": "ankera",
+        "type": "metric"
+      },
+      {
+        "key": "dvu_m2",
+        "name": "ДВУ за м²",
+        "type": "metric"
+      },
+      {
+        "key": "metizy",
+        "name": "Метизы",
+        "type": "metric"
+      },
+      {
+        "key": "profil",
+        "name": "Профиль",
+        "type": "metric"
+      },
+      {
+        "key": "region",
+        "name": "Регион",
+        "type": "link"
+      },
+      {
+        "key": "__debug",
+        "name": "debug",
+        "type": "skip"
+      },
+      {
+        "key": "__index",
+        "name": "index",
+        "type": "skip"
+      },
+      {
+        "key": "__tasks",
+        "name": "tasks",
+        "type": "link"
+      },
+      {
+        "key": "counrty",
+        "name": "Страна",
+        "type": "link"
+      },
+      {
+        "key": "montazh",
+        "name": "Монтаж",
+        "type": "metric"
+      },
+      {
+        "key": "nacenka",
+        "name": "Наценка",
+        "type": "metric"
+      },
+      {
+        "key": "temp_id",
+        "name": "Временный ID",
+        "type": "dimension"
+      },
+      {
+        "key": "__status",
+        "name": "Статус",
+        "type": "skip"
+      },
+      {
+        "key": "faily_ar",
+        "name": "Файлы АР",
+        "type": "link"
+      },
+      {
+        "key": "faily_tz",
+        "name": "Файлы ТЗ",
+        "type": "link"
+      },
+      {
+        "key": "protocol",
+        "name": "protocol",
+        "type": "link"
+      },
+      {
+        "key": "zarplata",
+        "name": "Зарплата",
+        "type": "metric"
+      },
+      {
+        "key": "__version",
+        "name": "Версия",
+        "type": "metric"
+      },
+      {
+        "key": "ankera_m2",
+        "name": "ankera за м²",
+        "type": "metric"
+      },
+      {
+        "key": "furnitura",
+        "name": "Фурнитура",
+        "type": "metric"
+      },
+      {
+        "key": "geodeziya",
+        "name": "geodeziya",
+        "type": "metric"
+      },
+      {
+        "key": "materialy",
+        "name": "Материалы",
+        "type": "metric"
+      },
+      {
+        "key": "metizy_m2",
+        "name": "Метизы за м²",
+        "type": "metric"
+      },
+      {
+        "key": "profil_m2",
+        "name": "Профиль за м²",
+        "type": "metric"
+      },
+      {
+        "key": "tip_rabot",
+        "name": "tip rabot",
+        "type": "skip"
+      },
+      {
+        "key": "zakazchik",
+        "name": "Заказчик",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "aksessuary",
+        "name": "aksessuary",
+        "type": "metric"
+      },
+      {
+        "key": "cf_chistyi",
+        "name": "Чистый CF",
+        "type": "metric"
+      },
+      {
+        "key": "kvadratura",
+        "name": "Площадь, м²",
+        "type": "metric"
+      },
+      {
+        "key": "montazh_m2",
+        "name": "Монтаж за м²",
+        "type": "metric"
+      },
+      {
+        "key": "reklamacii",
+        "name": "reklamacii",
+        "type": "metric"
+      },
+      {
+        "key": "tipy_rabot",
+        "name": "Типы работ",
+        "type": "link"
+      },
+      {
+        "key": "uderzhanie",
+        "name": "Удержание",
+        "type": "metric"
+      },
+      {
+        "key": "__createdAt",
+        "name": "Дата создания",
+        "type": "date"
+      },
+      {
+        "key": "__createdBy",
+        "name": "Создатель",
+        "type": "dimension"
+      },
+      {
+        "key": "__deletedAt",
+        "name": "Дата удаления",
+        "type": "date"
+      },
+      {
+        "key": "__directory",
+        "name": "directory",
+        "type": "skip"
+      },
+      {
+        "key": "__updatedAt",
+        "name": "Дата изменения",
+        "type": "date"
+      },
+      {
+        "key": "__updatedBy",
+        "name": "Редактор",
+        "type": "dimension"
+      },
+      {
+        "key": "faily_iz_mo",
+        "name": "Файлы из МО",
+        "type": "link"
+      },
+      {
+        "key": "faily_iz_os",
+        "name": "Файлы из ОС",
+        "type": "link"
+      },
+      {
+        "key": "faily_iz_sd",
+        "name": "Файлы из СД",
+        "type": "link"
+      },
+      {
+        "key": "kronshteiny",
+        "name": "kronshteiny",
+        "type": "metric"
+      },
+      {
+        "key": "primykaniya",
+        "name": "primykaniya",
+        "type": "metric"
+      },
+      {
+        "key": "specodezhda",
+        "name": "specodezhda",
+        "type": "metric"
+      },
+      {
+        "key": "uplotniteli",
+        "name": "Уплотнители",
+        "type": "metric"
+      },
+      {
+        "key": "zapolneniya",
+        "name": "Заполнения",
+        "type": "metric"
+      },
+      {
+        "key": "zarplata_m2",
+        "name": "Зарплата за м²",
+        "type": "metric"
+      },
+      {
+        "key": "__externalId",
+        "name": "externalId",
+        "type": "skip"
+      },
+      {
+        "key": "furnitura_m2",
+        "name": "Фурнитура за м²",
+        "type": "metric"
+      },
+      {
+        "key": "geodeziya_m2",
+        "name": "geodeziya за м²",
+        "type": "metric"
+      },
+      {
+        "key": "id_proekta_1",
+        "name": "ID объекта",
+        "type": "link",
+        "linkTo": "spravochnik_id"
+      },
+      {
+        "key": "izgotovlenie",
+        "name": "Изготовление",
+        "type": "metric"
+      },
+      {
+        "key": "materialy_m2",
+        "name": "Материалы за м²",
+        "type": "metric"
+      },
+      {
+        "key": "nds_k_uplate",
+        "name": "НДС к уплате",
+        "type": "metric"
+      },
+      {
+        "key": "transportnye",
+        "name": "Транспортные",
+        "type": "metric"
+      },
+      {
+        "key": "__subscribers",
+        "name": "Подписчики",
+        "type": "link"
+      },
+      {
+        "key": "aksessuary_m2",
+        "name": "aksessuary за м²",
+        "type": "metric"
+      },
+      {
+        "key": "genpodryadnye",
+        "name": "genpodryadnye",
+        "type": "metric"
+      },
+      {
+        "key": "reklamacii_m2",
+        "name": "reklamacii за м²",
+        "type": "metric"
+      },
+      {
+        "key": "faily_s_cenami",
+        "name": "Файлы с ценами",
+        "type": "link"
+      },
+      {
+        "key": "germetiki_klei",
+        "name": "Герметики/клей",
+        "type": "metric"
+      },
+      {
+        "key": "itogo_raskhody",
+        "name": "itogo raskhody",
+        "type": "metric"
+      },
+      {
+        "key": "kommentarii_ds",
+        "name": "kommentarii ds",
+        "type": "dimension"
+      },
+      {
+        "key": "kommentarii_mo",
+        "name": "kommentarii mo",
+        "type": "skip"
+      },
+      {
+        "key": "kommentarii_os",
+        "name": "kommentarii os",
+        "type": "skip"
+      },
+      {
+        "key": "kronshteiny_v2",
+        "name": "kronshteiny v2",
+        "type": "metric"
+      },
+      {
+        "key": "primykaniya_m2",
+        "name": "primykaniya за м²",
+        "type": "metric"
+      },
+      {
+        "key": "proektirovanie",
+        "name": "Проектирование",
+        "type": "metric"
+      },
+      {
+        "key": "rukovoditel_sd",
+        "name": "Руководитель Строительной Дирекции",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "specodezhda_m2",
+        "name": "specodezhda за м²",
+        "type": "metric"
+      },
+      {
+        "key": "uplotniteli_m2",
+        "name": "Уплотнители за м²",
+        "type": "metric"
+      },
+      {
+        "key": "zapolneniya_m2",
+        "name": "Заполнения за м²",
+        "type": "metric"
+      },
+      {
+        "key": "chistaya_pribyl",
+        "name": "Чистая прибыль",
+        "type": "metric"
+      },
+      {
+        "key": "faily_kp_oferta",
+        "name": "Файлы КП/оферта",
+        "type": "link"
+      },
+      {
+        "key": "izgotovlenie_m2",
+        "name": "Изготовление за м²",
+        "type": "metric"
+      },
+      {
+        "key": "nakladnye_s_nds",
+        "name": "Накладные с НДС",
+        "type": "metric"
+      },
+      {
+        "key": "nalog_na_pribyl",
+        "name": "Налог на прибыль",
+        "type": "metric"
+      },
+      {
+        "key": "osobye_usloviya",
+        "name": "osobye usloviya",
+        "type": "dimension"
+      },
+      {
+        "key": "subpodryadchiki",
+        "name": "Субподрядчики",
+        "type": "metric"
+      },
+      {
+        "key": "summa_kontrakta",
+        "name": "Сумма контракта",
+        "type": "skip"
+      },
+      {
+        "key": "tender_variants",
+        "name": "Варианты тендера",
+        "type": "link"
+      },
+      {
+        "key": "transportnye_m2",
+        "name": "Транспортные за м²",
+        "type": "metric"
+      },
+      {
+        "key": "data_okonchaniya",
+        "name": "Дата окончания",
+        "type": "date"
+      },
+      {
+        "key": "genpodryadnye_m2",
+        "name": "genpodryadnye за м²",
+        "type": "metric"
+      },
+      {
+        "key": "prochie_raskhody",
+        "name": "Прочие расходы",
+        "type": "metric"
+      },
+      {
+        "key": "rezultat_tendera",
+        "name": "Результат тендера",
+        "type": "dimension"
+      },
+      {
+        "key": "vypolnit_raschet",
+        "name": "Выполнить расчёт",
+        "type": "link"
+      },
+      {
+        "key": "germetiki_klei_m2",
+        "name": "Герметики/клей за м²",
+        "type": "metric"
+      },
+      {
+        "key": "iniciator_rabot_1",
+        "name": "Инициатор работ",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "itogo_raskhody_m2",
+        "name": "itogo raskhody за м²",
+        "type": "metric"
+      },
+      {
+        "key": "pobeditel_tendera",
+        "name": "Победитель тендера",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "proektirovanie_m2",
+        "name": "Проектирование за м²",
+        "type": "metric"
+      },
+      {
+        "key": "proforma_dogovora",
+        "name": "Проформа договора",
+        "type": "link"
+      },
+      {
+        "key": "tualetnye_kabinki",
+        "name": "tualetnye kabinki",
+        "type": "metric"
+      },
+      {
+        "key": "__tasks_performers",
+        "name": "tasks performers",
+        "type": "link"
+      },
+      {
+        "key": "cf_chistyi_procent",
+        "name": "Чистый CF, %",
+        "type": "dimension"
+      },
+      {
+        "key": "nasha_organizaciya",
+        "name": "Наша организация",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "podsobnye_rabochie",
+        "name": "podsobnye rabochie",
+        "type": "skip"
+      },
+      {
+        "key": "spisok_tipov_rabot",
+        "name": "Список типов работ",
+        "type": "skip"
+      },
+      {
+        "key": "stoimost_kontrakta",
+        "name": "Стоимость контракта",
+        "type": "metric"
+      },
+      {
+        "key": "subpodryadchiki_m2",
+        "name": "Субподрядчики за м²",
+        "type": "metric"
+      },
+      {
+        "key": "tendernyi_byudzhet",
+        "name": "Тендерный бюджет",
+        "type": "link"
+      },
+      {
+        "key": "uderzhanie_percent",
+        "name": "Удержание, %",
+        "type": "metric"
+      },
+      {
+        "key": "nds_20_ot_kontrakta",
+        "name": "НДС 20% от контракта",
+        "type": "metric"
+      },
+      {
+        "key": "otvetstvennyi_v_teo",
+        "name": "Ответственный в ТЭО",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "prochie_raskhody_m2",
+        "name": "Прочие расходы за м²",
+        "type": "metric"
+      },
+      {
+        "key": "rukovoditel_proekta",
+        "name": "Руководитель проекта",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "data_nachala_rabot_1",
+        "name": "Дата начала работ",
+        "type": "date"
+      },
+      {
+        "key": "data_nachala_tendera",
+        "name": "Дата начала тендера",
+        "type": "date"
+      },
+      {
+        "key": "faily_predv_rascheta",
+        "name": "Файлы предв. расчёта",
+        "type": "link"
+      },
+      {
+        "key": "itogo_cena_kontrakta",
+        "name": "Итого цена контракта",
+        "type": "metric"
+      },
+      {
+        "key": "podsobnye_rabochiem2",
+        "name": "podsobnye rabochiem2",
+        "type": "metric"
+      },
+      {
+        "key": "raskhodnye_materialy",
+        "name": "raskhodnye materialy",
+        "type": "metric"
+      },
+      {
+        "key": "rezultat_tendera_txt",
+        "name": "Результат тендера (текст)",
+        "type": "dimension"
+      },
+      {
+        "key": "sdacha_sks_dolshikam",
+        "name": "sdacha sks dolshikam",
+        "type": "metric"
+      },
+      {
+        "key": "tualetnye_kabinki_m2",
+        "name": "tualetnye kabinki за м²",
+        "type": "metric"
+      },
+      {
+        "key": "uslugi_podryadchikov",
+        "name": "uslugi podryadchikov",
+        "type": "skip"
+      },
+      {
+        "key": "__externalProcessMeta",
+        "name": "Метаданные процесса",
+        "type": "skip"
+      },
+      {
+        "key": "disagreements_protocol",
+        "name": "Протокол разногласий",
+        "type": "link"
+      },
+      {
+        "key": "konsultacionnye_uslugi",
+        "name": "konsultacionnye uslugi",
+        "type": "skip"
+      },
+      {
+        "key": "cf_bez_naloga_na_pribyl",
+        "name": "CF без налога на прибыль",
+        "type": "metric"
+      },
+      {
+        "key": "chistaya_pribyl_procent",
+        "name": "Чистая прибыль, %",
+        "type": "metric"
+      },
+      {
+        "key": "itogovaya_summa_tendera",
+        "name": "Итоговая сумма тендера",
+        "type": "metric"
+      },
+      {
+        "key": "kratkoe_nazvanie_obekta",
+        "name": "Объект (кратко)",
+        "type": "dimension"
+      },
+      {
+        "key": "nakladnye_s_nds_percent",
+        "name": "Накладные с НДС, %",
+        "type": "metric"
+      },
+      {
+        "key": "protokol_itogov_tendera",
+        "name": "Протокол итогов",
+        "type": "link"
+      },
+      {
+        "key": "raskhodnye_materialy_m2",
+        "name": "raskhodnye materialy за м²",
+        "type": "metric"
+      },
+      {
+        "key": "raskhody_na_prozhivanie",
+        "name": "raskhody na prozhivanie",
+        "type": "metric"
+      },
+      {
+        "key": "sdacha_sks_dolshikam_m2",
+        "name": "sdacha sks dolshikam за м²",
+        "type": "metric"
+      },
+      {
+        "key": "spisok_tipov_rabot_kody",
+        "name": "Коды типов работ",
+        "type": "dimension"
+      },
+      {
+        "key": "uslugi_podryadchikov_m2",
+        "name": "uslugi podryadchikov за м²",
+        "type": "metric"
+      },
+      {
+        "key": "__tasks_earliest_duedate",
+        "name": "tasks earliest duedate",
+        "type": "date"
+      },
+      {
+        "key": "data_okonchaniya_tendera",
+        "name": "Дата окончания тендера",
+        "type": "date"
+      },
+      {
+        "key": "stroitelnyi_adres_obekta",
+        "name": "Адрес объекта",
+        "type": "dimension"
+      },
+      {
+        "key": "dokhod_ot_okazaniya_uslug",
+        "name": "dokhod ot okazaniya uslug",
+        "type": "metric"
+      },
+      {
+        "key": "garantiinoe_obsluzhivanie",
+        "name": "garantiinoe obsluzhivanie",
+        "type": "skip"
+      },
+      {
+        "key": "genpodryadnye_vozmeshenie",
+        "name": "genpodryadnye vozmeshenie",
+        "type": "metric"
+      },
+      {
+        "key": "komandirovochnye_raskhody",
+        "name": "komandirovochnye raskhody",
+        "type": "skip"
+      },
+      {
+        "key": "konsultacionnye_uslugi_m2",
+        "name": "konsultacionnye uslugi за м²",
+        "type": "metric"
+      },
+      {
+        "key": "predstavitelskie_raskhody",
+        "name": "predstavitelskie raskhody",
+        "type": "skip"
+      },
+      {
+        "key": "raskhody_sverkh_byudzheta",
+        "name": "raskhody sverkh byudzheta",
+        "type": "skip"
+      },
+      {
+        "key": "srok_nachala_stroitelstva",
+        "name": "Срок начала строительства",
+        "type": "date"
+      },
+      {
+        "key": "vypolnit_proverku_proekta",
+        "name": "Проверка проекта",
+        "type": "dimension"
+      },
+      {
+        "key": "dochernie_processy_tendera",
+        "name": "Дочерние процессы",
+        "type": "link"
+      },
+      {
+        "key": "dvu_stoimost_kreditovaniya",
+        "name": "dvu stoimost kreditovaniya",
+        "type": "skip"
+      },
+      {
+        "key": "kommentarii_sotrudniku_teo",
+        "name": "Комментарий ТЭО",
+        "type": "skip"
+      },
+      {
+        "key": "proektirovanie_i_geodeziya",
+        "name": "proektirovanie i geodeziya",
+        "type": "metric"
+      },
+      {
+        "key": "raskhody_na_prozhivanie_m2",
+        "name": "raskhody na prozhivanie за м²",
+        "type": "metric"
+      },
+      {
+        "key": "zarplata_premialnaya_chast",
+        "name": "zarplata premialnaya chast",
+        "type": "metric"
+      },
+      {
+        "key": "arenda_stroitelnoi_tekhniki",
+        "name": "arenda stroitelnoi tekhniki",
+        "type": "metric"
+      },
+      {
+        "key": "proizvodstvennyi_instrument",
+        "name": "proizvodstvennyi instrument",
+        "type": "metric"
+      },
+      {
+        "key": "uslugi_kliningovoi_kompanii",
+        "name": "uslugi kliningovoi kompanii",
+        "type": "metric"
+      },
+      {
+        "key": "dokhod_ot_okazaniya_uslug_m2",
+        "name": "dokhod ot okazaniya uslug за м²",
+        "type": "metric"
+      },
+      {
+        "key": "garantiinoe_obsluzhivanie_m2",
+        "name": "garantiinoe obsluzhivanie за м²",
+        "type": "metric"
+      },
+      {
+        "key": "genpodryadnye_vozmeshenie_m2",
+        "name": "genpodryadnye vozmeshenie за м²",
+        "type": "metric"
+      },
+      {
+        "key": "komandirovochnye_raskhody_m2",
+        "name": "komandirovochnye raskhody за м²",
+        "type": "metric"
+      },
+      {
+        "key": "predstavitelskie_raskhody_m2",
+        "name": "predstavitelskie raskhody за м²",
+        "type": "metric"
+      },
+      {
+        "key": "raskhody_sverkh_byudzheta_m2",
+        "name": "raskhody sverkh byudzheta за м²",
+        "type": "metric"
+      },
+      {
+        "key": "spisok_tipov_rabot_nazvaniya",
+        "name": "Названия типов работ",
+        "type": "dimension"
+      },
+      {
+        "key": "tablica_dochernikh_processov",
+        "name": "Таблица дочерних процессов",
+        "type": "skip"
+      },
+      {
+        "key": "dvu_stoimost_kreditovaniya_m2",
+        "name": "dvu stoimost kreditovaniya за м²",
+        "type": "metric"
+      },
+      {
+        "key": "proektirovanie_i_geodeziya_m2",
+        "name": "proektirovanie i geodeziya за м²",
+        "type": "metric"
+      },
+      {
+        "key": "zarplata_premialnaya_chast_m2",
+        "name": "zarplata premialnaya chast за м²",
+        "type": "metric"
+      },
+      {
+        "key": "arenda_stroitelnoi_tekhniki_m2",
+        "name": "arenda stroitelnoi tekhniki за м²",
+        "type": "metric"
+      },
+      {
+        "key": "proizvodstvennyi_instrument_m2",
+        "name": "proizvodstvennyi instrument за м²",
+        "type": "metric"
+      },
+      {
+        "key": "raskhody_na_poluchenie_sredstv",
+        "name": "raskhody na poluchenie sredstv",
+        "type": "metric"
+      },
+      {
+        "key": "rukovoditel_montazhnogo_otdela",
+        "name": "Руководитель монтажного отдела",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "uslugi_kliningovoi_kompanii_m2",
+        "name": "uslugi kliningovoi kompanii за м²",
+        "type": "metric"
+      },
+      {
+        "key": "cf_bez_naloga_na_pribyl_procent",
+        "name": "CF без налога на прибыль, %",
+        "type": "metric"
+      },
+      {
+        "key": "varianty_zaklyucheniya_dogovora",
+        "name": "Варианты договора",
+        "type": "link"
+      },
+      {
+        "key": "vyvoz_musora_i_promyshl_otkhodov",
+        "name": "vyvoz musora i promyshl otkhodov",
+        "type": "metric"
+      },
+      {
+        "key": "dok_obespechenie_stroitelstva_ppr",
+        "name": "dok obespechenie stroitelstva ppr",
+        "type": "metric"
+      },
+      {
+        "key": "dvu_dok_obespechenie_stroitelstva",
+        "name": "dvu dok obespechenie stroitelstva",
+        "type": "metric"
+      },
+      {
+        "key": "raskhody_na_poluchenie_sredstv_m2",
+        "name": "raskhody na poluchenie sredstv за м²",
+        "type": "metric"
+      },
+      {
+        "key": "vyvoz_musora_i_promyshl_otkhodov_m2",
+        "name": "vyvoz musora i promyshl otkhodov за м²",
+        "type": "metric"
+      },
+      {
+        "key": "dok_obespechenie_stroitelstva_ppr_m2",
+        "name": "dok obespechenie stroitelstva ppr за м²",
+        "type": "metric"
+      },
+      {
+        "key": "dvu_dok_obespechenie_stroitelstva_m2",
+        "name": "dvu dok obespechenie stroitelstva за м²",
+        "type": "metric"
+      },
+      {
+        "key": "neobkhodimost_proverki_obyomov_rabot",
+        "name": "Проверка объёмов",
+        "type": "dimension"
+      },
+      {
+        "key": "pole_dlya_peresokhraneniya_zagolovka",
+        "name": "Заголовок",
+        "type": "dimension"
+      },
+      {
+        "key": "okhrana_truda_i_tekhnika_bezopasnosti",
+        "name": "Охрана труда",
+        "type": "metric"
+      },
+      {
+        "key": "nds_20_k_vychetu_za_matly_i_uslugi_vkhod",
+        "name": "НДС к вычету (мат-лы) вход",
+        "type": "metric"
+      },
+      {
+        "key": "okhrana_truda_i_tekhnika_bezopasnosti_m2",
+        "name": "Охрана труда за м²",
+        "type": "metric"
+      },
+      {
+        "key": "nds_20_k_vychetu_za_nakladnye_vkhodyashii",
+        "name": "НДС к вычету (накладные) вход",
+        "type": "metric"
+      },
+      {
+        "key": "predpolagaemaya_data_okonchaniya_stroitelstva",
+        "name": "Предп. дата окончания",
+        "type": "date"
+      },
+      {
+        "key": "skvoznoi_kommentarii_v_osnovnoi_forme_tendera",
+        "name": "Сквозной комментарий",
+        "type": "dimension"
+      },
+      {
+        "key": "faily_raschetov_s_ponizhenizhennoi_marzhinalnostyu",
+        "name": "Файлы с пониж. марж.",
+        "type": "link"
+      }
+    ]
+  },
+  {
+    "id": "spravochnik_id",
+    "name": "Справочник ID объектов строительства",
+    "description": "Центральный справочник-каталог объектов строительства с идентификаторами, типами работ, адресами, метражом, договорами и связями с заказчиками, клиентами, контрагентами",
+    "fields": [
+      {
+        "key": "__id",
+        "name": "ID записи",
+        "type": "dimension"
+      },
+      {
+        "key": "city",
+        "name": "Город",
+        "type": "link"
+      },
+      {
+        "key": "__name",
+        "name": "Название объекта",
+        "type": "dimension"
+      },
+      {
+        "key": "client",
+        "name": "Клиент",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "region",
+        "name": "Регион",
+        "type": "link"
+      },
+      {
+        "key": "__debug",
+        "name": "debug",
+        "type": "skip"
+      },
+      {
+        "key": "__index",
+        "name": "index",
+        "type": "skip"
+      },
+      {
+        "key": "__status",
+        "name": "Статус",
+        "type": "skip"
+      },
+      {
+        "key": "__version",
+        "name": "Версия",
+        "type": "metric"
+      },
+      {
+        "key": "zakazchik",
+        "name": "Заказчик",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "kontragent",
+        "name": "Контрагент",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "__createdAt",
+        "name": "Дата создания",
+        "type": "date"
+      },
+      {
+        "key": "__createdBy",
+        "name": "Создатель",
+        "type": "dimension"
+      },
+      {
+        "key": "__directory",
+        "name": "directory",
+        "type": "skip"
+      },
+      {
+        "key": "__updatedAt",
+        "name": "Дата изменения",
+        "type": "date"
+      },
+      {
+        "key": "__updatedBy",
+        "name": "Редактор",
+        "type": "dimension"
+      },
+      {
+        "key": "dogovor_txt",
+        "name": "Договор",
+        "type": "dimension"
+      },
+      {
+        "key": "itogovyi_id",
+        "name": "Итоговый ID",
+        "type": "dimension"
+      },
+      {
+        "key": "__externalId",
+        "name": "externalId",
+        "type": "skip"
+      },
+      {
+        "key": "__subscribers",
+        "name": "Подписчики",
+        "type": "link"
+      },
+      {
+        "key": "nasha_kompaniya",
+        "name": "Наша компания",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "kodovoe_nazvanie",
+        "name": "Кодовое название",
+        "type": "dimension"
+      },
+      {
+        "key": "zakazchik_po_crm",
+        "name": "Заказчик (CRM)",
+        "type": "link",
+        "linkTo": "_companies"
+      },
+      {
+        "key": "policeiskii_adres",
+        "name": "Полицейский адрес",
+        "type": "dimension"
+      },
+      {
+        "key": "raboty_po_tenderu",
+        "name": "Работы по тендеру",
+        "type": "link"
+      },
+      {
+        "key": "stroitelnyi_adres",
+        "name": "Строительный адрес",
+        "type": "dimension"
+      },
+      {
+        "key": "cifrovaya_chast_id",
+        "name": "Цифровая часть ID",
+        "type": "dimension"
+      },
+      {
+        "key": "data_zavedeniya_id",
+        "name": "Дата заведения ID",
+        "type": "date"
+      },
+      {
+        "key": "bukvennaya_chast_id",
+        "name": "Буквенная часть ID",
+        "type": "link"
+      },
+      {
+        "key": "rukovoditel_proekta",
+        "name": "Руководитель проекта",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "__externalProcessMeta",
+        "name": "externalProcessMeta",
+        "type": "skip"
+      },
+      {
+        "key": "bukvennaya_chast_id_txt",
+        "name": "Тип работ (букв. часть ID)",
+        "type": "dimension"
+      },
+      {
+        "key": "montazhnoe_podrazdelenie",
+        "name": "Монтажное подразделение",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "rukovoditel_stroitelnoi_direkcii",
+        "name": "Руководитель СД",
+        "type": "link",
+        "linkTo": "users"
+      }
+    ]
+  },
+  {
+    "id": "_companies",
+    "name": "Справочник компаний",
+    "description": "Все компании-контрагенты (заказчики, клиенты, подрядчики, наши организации). Используется для подстановки названий компаний во всех запросах",
+    "fields": [
+      {
+        "key": "bic",
+        "name": "BIC",
+        "type": "dimension"
+      },
+      {
+        "key": "opf",
+        "name": "ОПФ",
+        "type": "link"
+      },
+      {
+        "key": "__id",
+        "name": "ID компании",
+        "type": "dimension"
+      },
+      {
+        "key": "_bik",
+        "name": "БИК",
+        "type": "dimension"
+      },
+      {
+        "key": "_inn",
+        "name": "ИНН",
+        "type": "dimension"
+      },
+      {
+        "key": "_kpp",
+        "name": "КПП",
+        "type": "dimension"
+      },
+      {
+        "key": "bank",
+        "name": "Банк",
+        "type": "skip"
+      },
+      {
+        "key": "name",
+        "name": "Название",
+        "type": "dimension"
+      },
+      {
+        "key": "ogrn",
+        "name": "ОГРН",
+        "type": "dimension"
+      },
+      {
+        "key": "type",
+        "name": "Тип",
+        "type": "dimension"
+      },
+      {
+        "key": "_bank",
+        "name": "Банк",
+        "type": "dimension"
+      },
+      {
+        "key": "_ogrn",
+        "name": "ОГРН",
+        "type": "dimension"
+      },
+      {
+        "key": "files",
+        "name": "Файлы",
+        "type": "skip"
+      },
+      {
+        "key": "__name",
+        "name": "Название компании",
+        "type": "dimension"
+      },
+      {
+        "key": "_email",
+        "name": "Email",
+        "type": "link"
+      },
+      {
+        "key": "_leads",
+        "name": "Лиды",
+        "type": "link"
+      },
+      {
+        "key": "_phone",
+        "name": "Телефон",
+        "type": "link"
+      },
+      {
+        "key": "otrasl",
+        "name": "Отрасль",
+        "type": "link"
+      },
+      {
+        "key": "__debug",
+        "name": "debug",
+        "type": "skip"
+      },
+      {
+        "key": "__index",
+        "name": "index",
+        "type": "skip"
+      },
+      {
+        "key": "_address",
+        "name": "Адрес",
+        "type": "dimension"
+      },
+      {
+        "key": "_segment",
+        "name": "Сегмент",
+        "type": "link"
+      },
+      {
+        "key": "_website",
+        "name": "Веб-сайт",
+        "type": "dimension"
+      },
+      {
+        "key": "__version",
+        "name": "Версия",
+        "type": "metric"
+      },
+      {
+        "key": "_contacts",
+        "name": "Контакты",
+        "type": "link"
+      },
+      {
+        "key": "agreement",
+        "name": "Соглашение",
+        "type": "link"
+      },
+      {
+        "key": "_legalName",
+        "name": "Юридическое название",
+        "type": "dimension"
+      },
+      {
+        "key": "__createdAt",
+        "name": "Дата создания",
+        "type": "date"
+      },
+      {
+        "key": "__createdBy",
+        "name": "Создатель",
+        "type": "dimension"
+      },
+      {
+        "key": "__directory",
+        "name": "directory",
+        "type": "dimension"
+      },
+      {
+        "key": "__updatedAt",
+        "name": "Дата изменения",
+        "type": "date"
+      },
+      {
+        "key": "__updatedBy",
+        "name": "Редактор",
+        "type": "dimension"
+      },
+      {
+        "key": "_industries",
+        "name": "Индустрии",
+        "type": "link"
+      },
+      {
+        "key": "base_action",
+        "name": "Базовое действие",
+        "type": "dimension"
+      },
+      {
+        "key": "responsible",
+        "name": "Ответственный",
+        "type": "link",
+        "linkTo": "users"
+      },
+      {
+        "key": "__externalId",
+        "name": "externalId",
+        "type": "skip"
+      },
+      {
+        "key": "bank_details",
+        "name": "Банковские реквизиты",
+        "type": "link"
+      },
+      {
+        "key": "sale_segment",
+        "name": "Сегмент продаж",
+        "type": "link"
+      },
+      {
+        "key": "__subscribers",
+        "name": "Подписчики",
+        "type": "link"
+      },
+      {
+        "key": "_legalAddress",
+        "name": "Юридический адрес",
+        "type": "dimension"
+      },
+      {
+        "key": "_superiorName",
+        "name": "superiorName",
+        "type": "skip"
+      },
+      {
+        "key": "fio_signatory",
+        "name": "ФИО подписанта",
+        "type": "skip"
+      },
+      {
+        "key": "search_string",
+        "name": "Поисковая строка",
+        "type": "dimension"
+      },
+      {
+        "key": "type_of_agent",
+        "name": "Тип агента",
+        "type": "link"
+      },
+      {
+        "key": "_opportunities",
+        "name": "Сделки",
+        "type": "link"
+      },
+      {
+        "key": "_parentCompany",
+        "name": "Головная компания",
+        "type": "link"
+      },
+      {
+        "key": "_childCompanies",
+        "name": "Дочерние компании",
+        "type": "link"
+      },
+      {
+        "key": "payment_account",
+        "name": "Платёжный счёт",
+        "type": "skip"
+      },
+      {
+        "key": "showsuggestions",
+        "name": "Показывать подсказки",
+        "type": "skip"
+      },
+      {
+        "key": "tip_kontragenta",
+        "name": "Тип контрагента",
+        "type": "link"
+      },
+      {
+        "key": "_operatingAccount",
+        "name": "Расчётный счёт",
+        "type": "dimension"
+      },
+      {
+        "key": "signatory_position",
+        "name": "Должность подписанта",
+        "type": "dimension"
+      },
+      {
+        "key": "__externalProcessMeta",
+        "name": "externalProcessMeta",
+        "type": "skip"
+      },
+      {
+        "key": "_correspondentAccount",
+        "name": "Корр. счёт",
+        "type": "dimension"
+      },
+      {
+        "key": "correspondent_account",
+        "name": "Корр. счёт",
+        "type": "skip"
+      },
+      {
+        "key": "_correspondenceAddress",
+        "name": "Адрес для корреспонденции",
+        "type": "dimension"
+      },
+      {
+        "key": "marketingovoe_meropriyatiya",
+        "name": "Маркетинговые мероприятия",
+        "type": "link"
+      },
+      {
+        "key": "sotrudnik_vneshnei_organizacii",
+        "name": "Сотрудник внешней организации",
+        "type": "link"
+      }
+    ]
+  },
+  {
+    "id": "statusy_rabot_po_tenderam",
+    "name": "Статусы работ по тендерам",
+    "description": "Справочник статусов для работ по тендерам — возможные состояния (создан, в работе, завершен, выигран и т.д.)",
+    "fields": [
+      {
+        "key": "id",
+        "name": "ID статуса",
+        "type": "metric"
+      },
+      {
+        "key": "name",
+        "name": "Название статуса",
+        "type": "dimension"
+      },
+      {
+        "key": "code",
+        "name": "Код статуса",
+        "type": "dimension"
+      },
+      {
+        "key": "groupId",
+        "name": "Группа статуса",
+        "type": "dimension"
+      }
+    ]
+  },
+  {
+    "id": "users",
+    "name": "Пользователи",
+    "description": "Все пользователи системы с ФИО, email и идентификаторами. Центральный справочник сотрудников",
+    "fields": [
+      {
+        "key": "__id",
+        "name": "ID пользователя",
+        "type": "dimension"
+      },
+      {
+        "key": "__name",
+        "name": "ФИО",
+        "type": "skip"
+      },
+      {
+        "key": "__createdAt",
+        "name": "Дата создания",
+        "type": "date"
+      },
+      {
+        "key": "__createdBy",
+        "name": "Создатель",
+        "type": "dimension"
+      },
+      {
+        "key": "__updatedAt",
+        "name": "Дата изменения",
+        "type": "date"
+      },
+      {
+        "key": "__updatedBy",
+        "name": "Редактор",
+        "type": "dimension"
+      },
+      {
+        "key": "__deletedAt",
+        "name": "Дата удаления",
+        "type": "date"
+      },
+      {
+        "key": "fullname",
+        "name": "ФИО (полностью)",
+        "type": "dimension"
+      },
+      {
+        "key": "login",
+        "name": "Логин",
+        "type": "dimension"
+      },
+      {
+        "key": "email",
+        "name": "Email",
+        "type": "dimension"
+      },
+      {
+        "key": "owner",
+        "name": "Владелец",
+        "type": "dimension"
+      },
+      {
+        "key": "mobilePhone",
+        "name": "Мобильный телефон",
+        "type": "link"
+      },
+      {
+        "key": "workPhone",
+        "name": "Рабочий телефон",
+        "type": "link"
+      },
+      {
+        "key": "birthDate",
+        "name": "Дата рождения",
+        "type": "date"
+      },
+      {
+        "key": "hireDate",
+        "name": "Дата приёма",
+        "type": "date"
+      },
+      {
+        "key": "timezone",
+        "name": "Часовой пояс",
+        "type": "dimension"
+      },
+      {
+        "key": "displayedPosition",
+        "name": "Должность",
+        "type": "dimension"
+      },
+      {
+        "key": "osIds",
+        "name": "ОС ID",
+        "type": "link"
+      },
+      {
+        "key": "groupIds",
+        "name": "Группы",
+        "type": "link"
+      },
+      {
+        "key": "avatar",
+        "name": "Аватар",
+        "type": "link"
+      },
+      {
+        "key": "additionalData",
+        "name": "Доп. данные",
+        "type": "dimension"
+      }
+    ]
+  }
+]

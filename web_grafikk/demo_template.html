@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Демо — График витражей ELMA</title>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#eef1f5;--card:#fff;--primary:#1a73e8;--primary-dark:#1557b0;--text:#1c1e21;--muted:#5f6368;--border:#dadce0;--green:#188038;--red:#d93025;--radius:8px;--shadow:0 1px 3px rgba(0,0,0,.12)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;padding:16px}
+.header{background:var(--card);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.header h1{font-size:18px}
+.header .note{font-size:12px;color:var(--muted)}
+.content{display:flex;gap:16px;flex-wrap:wrap}
+.sidebar{flex:0 0 340px;min-width:280px}
+.main{flex:1;min-width:300px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:12px}
+.card h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text)}
+.search-box{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px;outline:0}
+.search-box:focus{border-color:var(--primary)}
+.object-list{max-height:320px;overflow-y:auto;margin-top:8px}
+.object-item{padding:8px 10px;border-radius:6px;cursor:pointer;border-bottom:1px solid #f0f0f0}
+.object-item:hover{background:#f0f6ff}
+.object-item.active{background:var(--primary);color:#fff}
+.object-item .obj-name{font-size:13px;font-weight:500}
+.object-item .obj-id{font-size:11px;color:var(--muted);margin-top:1px}
+.object-item.active .obj-id{color:rgba(255,255,255,.7)}
+.empty-state{padding:24px 16px;text-align:center;color:var(--muted);font-size:13px}
+.korpus-list{max-height:240px;overflow-y:auto}
+.korpus-item{display:flex;align-items:center;gap:8px;padding:6px 4px;font-size:13px}
+.korpus-item input[type=checkbox]{accent-color:var(--primary);width:16px;height:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:500;border:none;cursor:pointer;transition:background .15s}
+.btn-primary{background:var(--primary);color:#fff;width:100%}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-primary:disabled{background:#a8c7fa;cursor:not-allowed}
+.btn-outline{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{background:#f0f0f0}
+.btn-sm{padding:6px 14px;font-size:12px}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.loading{text-align:center;padding:40px 20px;color:var(--muted)}
+.loading .spinner{width:32px;height:32px;margin:0 auto 12px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:12px 24px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100;white-space:nowrap}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 График витражей — демо</h1>
+  <span class="note" id="statusNote">загрузка...</span>
+</div>
+
+<div id="app">
+  <div class="loading" id="loadingScreen">
+    <div class="spinner"></div>
+    Загрузка данных...
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const D = {};
+const FILES = ['vitrage','sprav','zadanie','users','statusy'];
+
+async function loadData(){
+  document.getElementById('statusNote').textContent = 'загрузка...';
+
+  if(location.protocol === 'file:'){
+    document.getElementById('statusNote').textContent = 'ОШИБКА: откройте через HTTP-сервер';
+    document.getElementById('loadingScreen').innerHTML =
+      '<div style="color:#d93025;text-align:center;padding:40px 20px;max-width:500px;margin:0 auto">' +
+      '<h2 style="font-size:18px;margin-bottom:12px">⚠️ Не удалось загрузить данные</h2>' +
+      '<p style="font-size:13px;line-height:1.6">' +
+      'Файл открыт напрямую из проводника (file://). Браузер блокирует загрузку данных.' +
+      '</p><p style="font-size:13px;line-height:1.6;margin-top:12px">' +
+      '▶️ Запустите <b>start_demo.ps1</b> (или <code>python -m http.server 8000 --bind 127.0.0.1</code>)' +
+      '<br>и откройте <a href="http://localhost:8000">http://localhost:8000</a>' +
+      '</p></div>';
+    return;
+  }
+
+  for(const name of FILES){
+    try {
+      const res = await fetch('data/'+name+'.json');
+      D[name] = await res.json();
+      console.log(name+'.json загружен: '+(Array.isArray(D[name])?D[name].length:Object.keys(D[name]).length)+' записей');
+    } catch(e){
+      console.error('Ошибка загрузки '+name+'.json:', e);
+      D[name] = name==='statusy' ? {} : [];
+    }
+  }
+  if(typeof D.statusy === 'object' && !Array.isArray(D.statusy)){}
+  else if(Array.isArray(D.statusy)){
+    const m = {}; D.statusy.forEach(s => { if(s.id) m[s.id]=s; }); D.statusy = m;
+  }
+  initApp();
+}
+
+const MONTHS_RU = ['','январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+const GREEN_STATUS_IDS = new Set([3,5,6]);
+
+function parseDate(val){
+  if(!val) return null;
+  const d = new Date(val.replace('Z',''));
+  return isNaN(d) ? null : d;
+}
+
+function buildIndex(){
+  const sm = {};
+  (D.sprav||[]).forEach(s => { if(s.itogovyi_id) sm[s.itogovyi_id] = s; });
+  const idx = {};
+  (D.vitrage||[]).forEach(r => {
+    const iid = r.itogovyi_id;
+    if(!iid) return;
+    if(!idx[iid]){
+      const s = sm[iid] || {};
+      idx[iid] = {id:iid, name:s.kodovoe_nazvanie || s.__name || iid, korpuses:new Set()};
+    }
+    idx[iid].korpuses.add(r.korpus || '');
+  });
+  return idx;
+}
+
+let OBJ_INDEX, currentObject, selectedKorpuses = new Set();
+
+function initApp(){
+  OBJ_INDEX = buildIndex();
+  document.getElementById('statusNote').textContent =
+    (D.vitrage||[]).length+' витражей · '+Object.keys(OBJ_INDEX).length+' объектов';
+
+  document.getElementById('loadingScreen').outerHTML = `
+    <div class="content">
+      <div class="sidebar">
+        <div class="card">
+          <h3>🔍 Поиск объекта</h3>
+          <input type="text" class="search-box" id="searchInput" placeholder="ID или название объекта...">
+          <div class="object-list" id="objectList"><div class="empty-state">Начните ввод для поиска</div></div>
+        </div>
+        <div class="card" id="korpusCard" style="display:none">
+          <h3>🏗️ Корпусы</h3>
+          <div style="margin-bottom:8px;display:flex;gap:6px">
+            <button class="btn btn-outline btn-sm" id="selectAllKorpus">Выбрать все</button>
+            <button class="btn btn-outline btn-sm" id="deselectAllKorpus">Сбросить</button>
+          </div>
+          <div class="korpus-list" id="korpusList"></div>
+        </div>
+      </div>
+      <div class="main">
+        <div class="card">
+          <h3>📊 Параметры</h3>
+          <div class="field"><label>Выбранный объект</label><div id="selectedObject" style="font-size:13px;color:var(--muted)">—</div></div>
+          <div class="field"><label>Секция (необязательно)</label>
+            <input type="text" class="search-box" id="sectionInput" placeholder="Пусто — все секции" style="font-size:13px;padding:8px 10px">
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <div class="field" style="flex:1;min-width:120px;margin-bottom:0"><label>Начало</label>
+              <input type="date" id="startDate" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px"></div>
+            <div class="field" style="flex:1;min-width:120px;margin-bottom:0"><label>Конец</label>
+              <input type="date" id="endDate" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px"></div>
+          </div>
+          <button class="btn btn-primary" id="generateBtn" disabled>📥 Скачать Excel</button>
+        </div>
+        <div class="card">
+          <h3>ℹ️ О демо</h3>
+          <p style="font-size:12px;color:var(--muted);line-height:1.6">
+            Демонстрация веб-интерфейса для формирования графиков производства витражей.
+            Данные загружаются из папки <b>data/</b>. Полная версия включает авторизацию,
+            управление пользователями, автообновление из ELMA и серверную генерацию Excel.
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+  bindUI();
+}
+
+function toast(m){
+  const el = document.getElementById('toast');
+  el.textContent = m; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove('show'), 3000);
+}
+
+function bindUI(){
+  let searchTimer;
+  document.getElementById('searchInput').addEventListener('input', function(){
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => searchObjects(this.value.trim()), 300);
+  });
+  document.getElementById('objectList').addEventListener('click', function(e){
+    const item = e.target.closest('.object-item');
+    if(item) selectObject(item.dataset.id, item.dataset.name);
+  });
+  document.getElementById('selectAllKorpus').onclick = ()=>{
+    document.querySelectorAll('#korpusList input').forEach(cb=>{cb.checked=true; selectedKorpuses.add(cb.value)});
+    document.getElementById('generateBtn').disabled = false;
+  };
+  document.getElementById('deselectAllKorpus').onclick = ()=>{
+    document.querySelectorAll('#korpusList input').forEach(cb=>{cb.checked=false});
+    selectedKorpuses.clear();
+    document.getElementById('generateBtn').disabled = true;
+  };
+  document.getElementById('generateBtn').addEventListener('click', function(){
+    if(!currentObject) return;
+    this.disabled = true; this.textContent = '⏳ Генерация...';
+    try {
+      generateExcel(currentObject, [...selectedKorpuses],
+        document.getElementById('sectionInput').value.trim() || null,
+        document.getElementById('startDate').value || null,
+        document.getElementById('endDate').value || null);
+      toast('Excel сформирован');
+    } catch(e){ toast('Ошибка: '+e.message); }
+    finally { this.disabled = false; this.textContent = '📥 Скачать Excel'; }
+  });
+}
+
+function searchObjects(q){
+  const list = document.getElementById('objectList');
+  if(!q){ list.innerHTML = '<div class="empty-state">Начните ввод для поиска</div>'; return; }
+  const ql = q.toLowerCase();
+  let items = Object.values(OBJ_INDEX).filter(o => o.id.toLowerCase().includes(ql) || o.name.toLowerCase().includes(ql));
+  items.sort((a,b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id));
+  list.innerHTML = items.length
+    ? items.map(o => '<div class="object-item" data-id="'+o.id+'" data-name="'+o.name.replace(/"/g,'&quot;')+'">' +
+      '<div class="obj-name">'+o.name+'</div><div class="obj-id">'+o.id+'</div></div>').join('')
+    : '<div class="empty-state">Ничего не найдено</div>';
+  if(currentObject){
+    const el = list.querySelector('[data-id="'+currentObject+'"]');
+    if(el) el.classList.add('active');
+  }
+}
+
+function selectObject(id, name){
+  currentObject = id;
+  document.querySelectorAll('.object-item').forEach(el => el.classList.remove('active'));
+  const el = document.querySelector('.object-item[data-id="'+id+'"]');
+  if(el) el.classList.add('active');
+  document.getElementById('selectedObject').textContent = name + ' (' + id + ')';
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('korpusCard').style.display = 'block';
+  selectedKorpuses = new Set();
+
+  const obj = OBJ_INDEX[id];
+  if(!obj){ document.getElementById('korpusList').innerHTML = '<div class="empty-state">Нет данных</div>'; return; }
+  const korps = [...obj.korpuses].filter(k => k).sort();
+  if(!korps.length){
+    document.getElementById('korpusList').innerHTML = '<div class="empty-state">Нет корпусов</div>';
+    document.getElementById('generateBtn').disabled = true; return;
+  }
+  document.getElementById('korpusList').innerHTML = korps.map(k =>
+    '<label class="korpus-item"><input type="checkbox" value="'+k.replace(/"/g,'&quot;')+'" onchange="toggleKorpus(this)"> '+k+'</label>'
+  ).join('');
+}
+
+function toggleKorpus(cb){
+  if(cb.checked) selectedKorpuses.add(cb.value);
+  else selectedKorpuses.delete(cb.value);
+  document.getElementById('generateBtn').disabled = selectedKorpuses.size === 0;
+}
+
+// ============ EXCEL GENERATION ============
+function generateExcel(objectId, corpusFilter, sectionFilter, startDate, endDate){
+  const sm = {}; (D.sprav||[]).forEach(s => { if(s.itogovyi_id) sm[s.itogovyi_id] = s; });
+  const zm = {}; (D.zadanie||[]).forEach(z => { const i=z.__id; if(i) zm[i]=z; });
+  const um = {}; (D.users||[]).forEach(u => { const i=u.__id; if(i) um[i]=u; });
+
+  const dopIds = new Set();
+  Object.values(zm).forEach(z => { if(z.dop_zakaz_kmd_ref) dopIds.add(z.__id); });
+
+  let items = (D.vitrage||[]).filter(r => !r.__deletedAt && r.itogovyi_id === objectId);
+  const cs = new Set(corpusFilter||[]);
+  if(cs.size) items = items.filter(r => cs.has(r.korpus));
+  if(sectionFilter) items = items.filter(r => r.sections === sectionFilter);
+  if(!items.length) throw new Error('Нет данных для фильтров');
+
+  const so = sm[objectId] || {};
+  const objName = so.kodovoe_nazvanie || so.__name || objectId;
+  const objAddr = so.stroitelnyi_adres || '';
+
+  const records = [];
+  items.forEach(r => {
+    const names = (r.vitrazh||'').split(',').map(v=>v.trim()).filter(Boolean);
+    if(!names.length) return;
+    const nd = parseDate(r.nachalo_kmd);
+    const fd = parseDate(r.fakt_konec_kmd) || parseDate(r.konec_kmd);
+    const hf = !!parseDate(r.fakt_konec_kmd);
+    const mz = new Set((r.zadanie_na_kmd_2025||[]).filter(x => !dopIds.has(x)));
+    const az = new Set([...mz, ...(r.dop_kmd||[])]);
+    let fr = false; az.forEach(zid => { const z=zm[zid]; if(z&&z.freelance) fr=true; });
+    let init = '';
+    if(fr) init='Fr';
+    else{
+      const cids = Array.isArray(r.constructor_kmd)?r.constructor_kmd:(r.constructor_kmd?[r.constructor_kmd]:[]);
+      for(const cid of cids){
+        const u=um[cid]; if(!u) continue;
+        const fn=u.fullname;
+        if(typeof fn==='object'&&fn){ init=((fn.lastname||'')[0]||'')+((fn.firstname||'')[0]||''); }
+        else if(typeof fn==='string'){ const p=fn.split(' '); init=p.length>=2?p[0][0]+p[1][0]:p[0][0]; }
+        if(init) break;
+      }
+    }
+    let re=null, si=null;
+    for(const zid of mz){
+      const z=zm[zid];
+      if(z&&!re){ const ro=parseDate(z.rop_date_original); if(ro) re=new Date(ro.getFullYear(),ro.getMonth(),ro.getDate()); }
+      if(z&&!si&&z.__status&&typeof z.__status==='object') si=z.__status.status;
+    }
+    const n=names.length;
+    names.forEach(name => {
+      records.push({
+        name, korpus:r.korpus||'', section:r.sections||'',
+        nachalo: nd?new Date(nd.getFullYear(),nd.getMonth(),nd.getDate()):null,
+        faktKonec: fd?new Date(fd.getFullYear(),fd.getMonth(),fd.getDate()):null,
+        hasFaktKonec:hf, ropEnd:re, zadStatusId:si, initials:init,
+        ploshad: r.ploshad_po_km_m2?r.ploshad_po_km_m2/n:null,
+        stvorok: r.kolichestvo_stvorok?r.kolichestvo_stvorok/n:null,
+        ventresh: r.kolichestvo_ventreshetok?r.kolichestvo_ventreshetok/n:null,
+      });
+    });
+  });
+  if(!records.length) throw new Error('Нет витражей');
+
+  const ds=[]; records.forEach(r=>{[r.nachalo,r.faktKonec,r.ropEnd].forEach(d=>{if(d)ds.push(d.getTime())});});
+  let mn=ds.length?new Date(Math.min(...ds)):new Date(), mx=ds.length?new Date(Math.max(...ds)):new Date();
+  if(startDate){const d=new Date(startDate);if(!isNaN(d))mn=d;}
+  if(endDate){const d=new Date(endDate);if(!isNaN(d))mx=d;}
+
+  const months=[], mm={};
+  let d8=new Date(mn);
+  while(d8<=mx){
+    const k=d8.getFullYear()+'-'+d8.getMonth();
+    if(!mm[k]){const m={key:k,year:d8.getFullYear(),month:d8.getMonth(),days:[]}; months.push(m); mm[k]=m;}
+    mm[k].days.push(d8.getDate());
+    d8=new Date(d8.getFullYear(),d8.getMonth(),d8.getDate()+1);
+  }
+  months.forEach(m=>{
+    const ld=new Date(m.year,m.month+1,0).getDate();
+    const ex=new Set(m.days); for(let i=1;i<=ld;i++) if(!ex.has(i)) m.days.push(i);
+    m.days.sort((a,b)=>a-b);
+  });
+  const dc=[];
+  months.forEach(m=>{m.days.forEach(d=>{dc.push({date:new Date(m.year,m.month,d),key:m.key})});});
+  records.sort((a,b)=>(a.korpus||'').localeCompare(b.korpus||'')||(a.section||'').localeCompare(b.section||'')||(a.name||'').localeCompare(b.name||''));
+
+  const ih=['корпус','Секция','№ витража по КМ','№ витража по АР','наименование работ','Этажность.','Створки по КМ, шт.','Вентреш. по КМ, шт.','КМ, в м²','кол-во, шт'];
+  const ic=ih.length, tc=ic+dc.length;
+  const rows=[];
+  const ar=Array(tc).fill(''); ar[0]=objAddr; rows.push(ar);
+  const nr=Array(tc).fill(''); nr[0]=objName+' ('+objectId+')'; rows.push(nr);
+  const mr=Array(tc).fill('');
+  months.forEach(m=>{let f=ic;for(const c of dc){if(c.key===m.key)break;f++;}mr[Math.floor((f+f+m.days.length-1)/2)]=MONTHS_RU[m.month+1]+' '+m.year;});
+  rows.push(mr);
+  const d1=Array(tc).fill(''), d2=Array(tc).fill('');
+  dc.forEach((c,i)=>{const ci=ic+i;if(c.date.getDate()%2)d1[ci]=c.date.getDate();else d2[ci]=c.date.getDate();});
+  rows.push(d1); rows.push(d2);
+
+  const dataStart=rows.length;
+  const grp=[]; let ck=null;
+  records.forEach(r=>{if(!grp.length||grp[grp.length-1].k!==r.korpus)grp.push({k:r.korpus,secs:[]});const s=grp[grp.length-1].secs;if(!s.length||s[s.length-1].s!==r.section)s.push({s:r.section,recs:[]});s[s.length-1].recs.push(r);});
+  grp.forEach(g=>{g.secs.forEach(s=>{s.recs.forEach(r=>{const row=Array(tc).fill('');row[2]=row[3]=r.name;row[4]='кмд';if(r.stvorok)row[6]=Math.round(r.stvorok*10)/10;if(r.ventresh)row[7]=Math.round(r.ventresh*10)/10;if(r.ploshad)row[8]=Math.round(r.ploshad*100)/100;row[9]=1;rows.push(row);});const tr=Array(tc).fill('');tr[1]='Всего (витражи):';const ss=s.recs.reduce((a,r)=>a+(r.stvorok||0),0);const sv=s.recs.reduce((a,r)=>a+(r.ventresh||0),0);const sp=s.recs.reduce((a,r)=>a+(r.ploshad||0),0);if(ss)tr[6]=Math.round(ss*10)/10;if(sv)tr[7]=Math.round(sv*10)/10;if(sp)tr[8]=Math.round(sp*100)/100;tr[9]=s.recs.length;rows.push(tr);});});
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const mg=[];
+  mg.push({s:{r:0,c:0},e:{r:0,c:tc-1}},{s:{r:1,c:0},e:{r:1,c:tc-1}});
+  for(let i=0;i<ic;i++) mg.push({s:{r:3,c:i},e:{r:4,c:i}});
+  months.forEach(m=>{let f=ic;for(const c of dc){if(c.key===m.key)break;f++;}mg.push({s:{r:2,c:f},e:{r:2,c:f+m.days.length-1}});});
+  let dr=dataStart;
+  grp.forEach(g=>{const cs=dr;g.secs.forEach(s=>{const ss=dr;dr+=s.recs.length;if(ss<dr-1)mg.push({s:{r:ss,c:1},e:{r:dr-1,c:1}});const ti=dr;mg.push({s:{r:ti,c:1},e:{r:ti,c:4}});dr++;});if(cs<dr-1)mg.push({s:{r:cs,c:0},e:{r:dr-1,c:0}});});
+  ws['!merges']=mg;
+  ws['!cols']=[{wch:13},{wch:13},{wch:19},{wch:13},{wch:14},{wch:12},{wch:13},{wch:13},{wch:12},{wch:12},...dc.map(()=>({wch:4}))];
+
+  const bF={patternType:'solid',fgColor:{rgb:'BDD7EE'}};
+  const gF={patternType:'solid',fgColor:{rgb:'C6EFCE'}};
+  const yF={patternType:'solid',fgColor:{rgb:'FFEB9C'}};
+  const tB={top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}};
+
+  for(let r=0;r<5;r++) for(let c=0;c<tc;c++){const a=XLSX.utils.encode_cell({r,c});if(!ws[a])ws[a]={t:'s',v:''};if(!ws[a].s)ws[a].s={};ws[a].s.font={bold:r<=2,sz:r<=1?14:(r===2?11:8)};ws[a].s.alignment={horizontal:'center',vertical:'center',wrapText:true};}
+  dc.forEach((c,i)=>{const ci=ic+i;for(let r=3;r<5;r++){const a=XLSX.utils.encode_cell({r,ci});if(!ws[a])ws[a]={t:'s',v:''};if(!ws[a].s)ws[a].s={};ws[a].s.border={...tB};if(c.date.getDate()===1)ws[a].s.border.left={style:'thick'};else if(c.date.getDay()===1)ws[a].s.border.left={style:'medium'};}});
+
+  records.forEach((rec,ri)=>{const r=dataStart+ri;
+    for(let c=0;c<tc;c++){const a=XLSX.utils.encode_cell({r,c});if(!ws[a])ws[a]={t:'s',v:''};if(!ws[a].s)ws[a].s={};ws[a].s.alignment={horizontal:'center',vertical:'center'};ws[a].s.border={...tB};}
+    if(rec.nachalo) dc.forEach((c,i)=>{const ci=ic+i, day=c.date;let end=null,fill=null;if(rec.hasFaktKonec&&rec.faktKonec){end=rec.faktKonec;fill=rec.zadStatusId&&!GREEN_STATUS_IDS.has(rec.zadStatusId)?yF:gF;}else if(rec.ropEnd){end=rec.ropEnd;fill=bF;}if(end&&rec.nachalo<=day&&day<=end){const a=XLSX.utils.encode_cell({r,ci});if(!ws[a])ws[a]={t:'s',v:''};if(!ws[a].s)ws[a].s={};ws[a].s.fill=fill;if(rec.initials){ws[a].v=rec.initials;ws[a].s.font={sz:7};}}});
+    let fill=null;if(rec.hasFaktKonec&&rec.faktKonec)fill=rec.zadStatusId&&!GREEN_STATUS_IDS.has(rec.zadStatusId)?yF:gF;else if(rec.nachalo)fill=bF;
+    if(fill) for(let c=2;c<=9;c++){const a=XLSX.utils.encode_cell({r,c});if(!ws[a])ws[a]={t:'s',v:''};if(!ws[a].s)ws[a].s={};ws[a].s.fill=fill;}
+  });
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'График производства');
+  const safeId=String(objectId).replace(/[/\\]/g,'_');
+  XLSX.writeFile(wb, safeId+'_Grafik_vitrazhey.xlsx');
+}
+
+loadData();
+</script>
+</body>
+</html>

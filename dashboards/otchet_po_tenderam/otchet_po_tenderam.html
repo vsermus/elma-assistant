@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Отчёт по выигранным тендерам</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f6fa; color: #2d3436; padding: 30px; }
+.container { max-width: 1300px; margin: 0 auto; }
+h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; color: #1a1a2e; }
+.period { display: flex; align-items: center; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+.period label { font-size: 14px; color: #636e72; font-weight: 500; }
+.period input[type="date"] { padding: 7px 10px; border: 1px solid #dfe6e9; border-radius: 6px; font-size: 14px; background: #fff; color: #2d3436; outline: none; font-family: inherit; }
+.period input[type="date"]:focus { border-color: #6c5ce7; box-shadow: 0 0 0 2px rgba(108,92,231,0.15); }
+.period .apply { padding: 7px 18px; background: #6c5ce7; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+.period .apply:hover { background: #5a4bd1; }
+.period .info { font-size: 13px; color: #636e72; margin-left: auto; }
+.section-title { font-size: 18px; font-weight: 600; margin-bottom: 14px; margin-top: 24px; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+.section-title .badge { font-size: 12px; font-weight: 400; color: #636e72; }
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 24px; }
+th { background: #1a1a2e; color: #fff; padding: 12px 14px; text-align: left; font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+td { padding: 12px 14px; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+tr:last-child td { border-bottom: none; }
+tr.total td { background: #eef0ff; font-weight: 600; border-top: 2px solid #1a1a2e; }
+.num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'SF Mono', 'Consolas', monospace; }
+.chart-wrap { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 24px; }
+.chart-wrap h2 { font-size: 15px; font-weight: 500; margin-bottom: 14px; color: #1a1a2e; }
+.charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.empty { text-align: center; padding: 36px !important; color: #b2bec3; font-size: 14px; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 500; }
+.badge-ВХ { background: #eef0ff; color: #6c5ce7; }
+.badge-ВТ { background: #e6fff8; color: #00b894; }
+.badge-ПМ { background: #fff3e6; color: #e17055; }
+.badge-ВФ { background: #e6f7ff; color: #0984e3; }
+.badge-РМ { background: #ffe6e6; color: #d63031; }
+.badge-СК { background: #f0e6ff; color: #a855f7; }
+.badge-МФ { background: #e6ffe6; color: #16a34a; }
+.badge-ПР { background: #f5f5f5; color: #636e72; }
+.badge-ТХ { background: #e6f0ff; color: #2563eb; }
+.badge-ВО { background: #fef3e2; color: #d97706; }
+.badge-default { background: #f0f0f0; color: #636e72; }
+.summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.summary-card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.summary-card .label { font-size: 12px; color: #636e72; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; }
+.summary-card .value { font-size: 22px; font-weight: 600; color: #1a1a2e; font-variant-numeric: tabular-nums; }
+@media (max-width: 768px) { body { padding: 16px; } .charts { grid-template-columns: 1fr; } .summary-cards { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Отчёт по выигранным тендерам</h1>
+<div class="period">
+  <label>Начало</label>
+  <input type="date" id="dateFrom">
+  <label>Окончание</label>
+  <input type="date" id="dateTo">
+  <button class="apply" onclick="applyFilter()">Применить</button>
+  <span class="info" id="infoText">Загрузка...</span>
+</div>
+
+<div class="summary-cards" id="summaryCards"></div>
+
+<table id="reportTable">
+  <thead>
+    <tr>
+      <th>Тип работ</th>
+      <th class="num">Площадь, м²</th>
+      <th class="num">Ср. стоимость, ₽</th>
+      <th class="num">Сумма, ₽</th>
+      <th class="num">Тендеров</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+
+<div class="charts">
+  <div class="chart-wrap">
+    <h2>Площадь по типам работ, м²</h2>
+    <canvas id="areaChart"></canvas>
+  </div>
+  <div class="chart-wrap">
+    <h2>Сумма по типам работ, ₽</h2>
+    <canvas id="sumChart"></canvas>
+  </div>
+</div>
+
+<div class="section-title">Детальная развёртка <span class="badge" id="detailCount"></span></div>
+<table id="detailTable">
+  <thead>
+    <tr>
+      <th>Тендер</th>
+      <th>Тип работ</th>
+      <th class="num">Площадь, м²</th>
+      <th class="num">Сумма, ₽</th>
+      <th>Дата</th>
+    </tr>
+  </thead>
+  <tbody id="detailBody"></tbody>
+</table>
+</div>
+
+<script>
+const rawData = [
+    {
+        "id":  "018b4bde-c668-791d-aed5-69c88e770cc3",
+        "name":  "ЖК \"Прагма city\"",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  8500.36,
+        "summa":  34585074.72,
+        "date":  "2023-10-20T07:14:01Z"
+    },
+    {
+        "id":  "018b60b3-4204-76e7-b394-add36133f2b3",
+        "name":  "ЖК Скандинавия",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  17741.7,
+        "summa":  127075146.31,
+        "date":  "2023-10-24T08:31:54Z"
+    },
+    {
+        "id":  "018b6188-3451-756d-a082-60e1ea27c2cf",
+        "name":  "Жилой дом 5 (3-й этап)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  4915.88,
+        "summa":  16150484.68,
+        "date":  "2023-10-24T12:05:12Z"
+    },
+    {
+        "id":  "018c53d9-3330-7aaa-a079-bd7b8deb68d6",
+        "name":  "ЖК Десяткино",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  2642,
+        "summa":  9939124.74,
+        "date":  "2023-12-10T13:25:19Z"
+    },
+    {
+        "id":  "018c8d25-185c-769c-8752-cd247a04e14c",
+        "name":  "Бакунина 33",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  1038.98,
+        "summa":  13386498.84,
+        "date":  "2023-12-21T16:22:35Z"
+    },
+    {
+        "id":  "018c9fc3-549b-7f14-b45d-9727f3580f72",
+        "name":  "ALL IN 3.0 - ВХ",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  26436.39,
+        "summa":  43908701.55,
+        "date":  "2023-12-25T07:28:26Z"
+    },
+    {
+        "id":  "018d1b8f-04e4-7deb-8bbf-3c3752dbae87",
+        "name":  "Пражская, Паркинг",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-01-18T08:17:38Z"
+    },
+    {
+        "id":  "018d1ba7-7053-7cf2-b287-768875edbf80",
+        "name":  "ЖК Орловский бульвар (поз.4)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  762.24,
+        "summa":  2952980.31,
+        "date":  "2024-01-18T08:29:59Z"
+    },
+    {
+        "id":  "018d1bb1-8d26-7bb0-874c-921cb33418f3",
+        "name":  "ЖК Орловский бульвар (поз. 5)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  991.69,
+        "summa":  3859359.92,
+        "date":  "2024-01-18T08:33:51Z"
+    },
+    {
+        "id":  "018d40ce-7996-7f5c-98ad-663808645fce",
+        "name":  "Юнтолово, К3; 4",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  502.88,
+        "summa":  2865304.64,
+        "date":  "2024-01-25T13:35:00Z"
+    },
+    {
+        "id":  "018dc1ee-76c0-738d-9710-0895cfc1c93c",
+        "name":  "Глухарская 20. ДОО",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  59.2,
+        "summa":  647371.54,
+        "date":  "2024-02-19T15:18:43Z"
+    },
+    {
+        "id":  "018dca80-b075-75da-aec6-47cb17df5f6d",
+        "name":  "Астра Марин (К.1)",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  4176.2,
+        "summa":  6480501.87,
+        "date":  "2024-02-21T07:50:57Z"
+    },
+    {
+        "id":  "018dcabc-5f6b-7fcb-b433-3bada9194372",
+        "name":  "ЖК Пульс Премьер-3 Корпус-К.3.1.3",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  4502.86,
+        "summa":  5939227.31,
+        "date":  "2024-02-21T08:28:51Z"
+    },
+    {
+        "id":  "018e0d63-cce6-7680-bc1f-b5bdade1ccf4",
+        "name":  "ЖК Город Звезд 2 оч.",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  19797.62,
+        "summa":  37352621.39,
+        "date":  "2024-03-05T07:03:12Z"
+    },
+    {
+        "id":  "018e1265-2ab9-7ddd-a4f1-3292aaf400c1",
+        "name":  "ЖД \"Путиловская\"",
+        "tip_code":  "tkh_vitrazhi_tyoplo-kholodnye",
+        "tip_name":  "ТХ – Витражи Тёпло-Холодные",
+        "kvadratura":  746.1,
+        "summa":  9775357.43,
+        "date":  "2024-03-06T06:32:59Z"
+    },
+    {
+        "id":  "018e18a0-5b9a-7f90-bddd-74e76d2ef88c",
+        "name":  "ALL IN 3.0 - ВТ",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  21241.61,
+        "summa":  8472080.98,
+        "date":  "2024-03-07T11:21:40Z"
+    },
+    {
+        "id":  "018e8a65-0a90-7bee-a866-089f89374613",
+        "name":  "ЖК Тридевяткино царство, строение 10 (1 этажи)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  358.36,
+        "summa":  1607029.58,
+        "date":  "2024-03-29T13:50:38Z"
+    },
+    {
+        "id":  "018e9943-4e31-7767-956e-f7c19fada235",
+        "name":  "ЖК Univer City кор 2",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-04-01T10:48:57Z"
+    },
+    {
+        "id":  "018eb39a-3b1f-79d5-8a1b-45c41a0ee88d",
+        "name":  "Enter, г. Ташкент, МИД",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  1851.5,
+        "summa":  0.0,
+        "date":  "2024-04-06T13:45:28Z"
+    },
+    {
+        "id":  "018eb3b3-c3f4-74b2-aa67-073c07c62e17",
+        "name":  "Enter, г. Ташкент, Curio",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  4161.6,
+        "summa":  7018538.40,
+        "date":  "2024-04-06T14:07:26Z"
+    },
+    {
+        "id":  "018ed28a-d600-7d91-a634-7e76c2432130",
+        "name":  "ЖК Залив, 2 очередь_к.15 (ВХ)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  2801.29,
+        "summa":  8065418.14,
+        "date":  "2024-04-12T13:58:39Z"
+    },
+    {
+        "id":  "018ed2ba-ae1a-71e7-ab6f-fea96f3b49f9",
+        "name":  "ЖК Залив, 2 очередь_к.16 (ВХ)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  1994.79,
+        "summa":  5905416.21,
+        "date":  "2024-04-12T14:53:57Z"
+    },
+    {
+        "id":  "018ed2e3-1292-7a1c-8d57-86d43d7c2124",
+        "name":  "NRG, г. Ташкент, ЖК Qorasuv",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-04-12T15:23:58Z"
+    },
+    {
+        "id":  "018ed2eb-0650-7a57-8b95-6702bfc6752c",
+        "name":  "NRG, г. Ташкент, ЖК JOMIY",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-04-12T15:30:23Z"
+    },
+    {
+        "id":  "018f3956-db73-7b0a-8ae0-36d00821e97a",
+        "name":  "г. Тюмень. ЖК Дивный",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-05-02T12:50:31Z"
+    },
+    {
+        "id":  "018f39c5-766b-7efa-8b3e-fcfdf023c338",
+        "name":  "г. Хабаровск. ЖК на Кулибина",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-05-02T14:56:19Z"
+    },
+    {
+        "id":  "018f39d9-f6f2-73e2-bc99-8da7158c632e",
+        "name":  "г. Тюмень. ЖК Мотивы",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-05-02T15:10:22Z"
+    },
+    {
+        "id":  "018f39dd-1e75-7bb1-a299-f51b955347b3",
+        "name":  "г. Хабаровск. ЖК Эдельвейс",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-05-02T15:14:04Z"
+    },
+    {
+        "id":  "018f56eb-275b-7f3e-8201-1e2911ad0b9f",
+        "name":  "ДОУ \"Авангард Детям\"",
+        "tip_code":  "mf_mokrye_fasady_shtukaturnye",
+        "tip_name":  "МФ – Мокрые Фасады (штукатурные)",
+        "kvadratura":  389.3,
+        "summa":  0.0,
+        "date":  "2024-05-08T06:42:21Z"
+    },
+    {
+        "id":  "018f9fde-10a4-7331-8617-785e33d78621",
+        "name":  "ЖК Орловский бульвар (поз. 6)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  964.08,
+        "summa":  4268714.80,
+        "date":  "2024-05-22T10:50:15Z"
+    },
+    {
+        "id":  "018fa071-f65f-7f5a-8b12-4da4565b20d1",
+        "name":  "ЖК Тридевяткино царство, строение 9 (1 этажи)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  354.27,
+        "summa":  1594314.20,
+        "date":  "2024-05-22T13:21:29Z"
+    },
+    {
+        "id":  "018fbdfa-91f3-70f3-928d-24882beb60ec",
+        "name":  "ЖК Сертолово Парк",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  2035.79,
+        "summa":  6666138.86,
+        "date":  "2024-05-28T07:08:33Z"
+    },
+    {
+        "id":  "018fc4ae-bc1e-7ed3-bfd9-26391d3cc880",
+        "name":  "Электробус-Наше ВСЁ!!!",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  17828.89,
+        "summa":  67995285.82,
+        "date":  "2024-05-29T14:13:48Z"
+    },
+    {
+        "id":  "018fc9d0-e633-719d-9fd6-dd36590cf0c8",
+        "name":  "Школа, Каменка 19",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  394.59,
+        "summa":  3720470.73,
+        "date":  "2024-05-30T14:48:51Z"
+    },
+    {
+        "id":  "019007b9-013f-7b9d-85d0-a4d4734cd901",
+        "name":  "ЖК Ясно. Янино уч.14 (этап 2)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  8345.01,
+        "summa":  28014782.94,
+        "date":  "2024-06-11T14:46:10Z"
+    },
+    {
+        "id":  "01902f8e-0910-791e-9381-0533dc4c6641",
+        "name":  "ремонт стены",
+        "tip_code":  "mf_mokrye_fasady_shtukaturnye",
+        "tip_name":  "МФ – Мокрые Фасады (штукатурные)",
+        "kvadratura":  345.32,
+        "summa":  209716.29,
+        "date":  "2024-06-19T08:24:20Z"
+    },
+    {
+        "id":  "019053c5-da34-7ff8-bddf-a3c2432ab1b9",
+        "name":  "БЦ на арцеуловской аллее д.5",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  37.14,
+        "summa":  384774.19,
+        "date":  "2024-06-26T09:10:52Z"
+    },
+    {
+        "id":  "01906e5f-b78f-7117-98c3-f5331631d9cb",
+        "name":  "Лагуна парк ГД",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  15,
+        "summa":  0,
+        "date":  "2024-07-01T13:30:37Z"
+    },
+    {
+        "id":  "0190c6cf-a85e-780f-9cca-7c7e3d3a12cd",
+        "name":  "ЖК в Рощино",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  6773.82,
+        "summa":  37017842.49,
+        "date":  "2024-07-18T17:14:21Z"
+    },
+    {
+        "id":  "0190ee0f-bde4-7849-94a0-4ea27aa25bad",
+        "name":  "Полuс Новоселье (ЖД1, ЖД2, паркинг)",
+        "tip_code":  "sk_steklyannye_kozyrki",
+        "tip_name":  "СК – Стеклянные Козырьки",
+        "kvadratura":  513.62,
+        "summa":  2061598.77,
+        "date":  "2024-07-26T08:10:54Z"
+    },
+    {
+        "id":  "0190fe1d-fd86-7daf-baa9-6516937108b6",
+        "name":  "ЖК \"Univer City\" корп. 8 (Фасады)",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  10770.18,
+        "summa":  24013830.79,
+        "date":  "2024-07-29T10:58:58Z"
+    },
+    {
+        "id":  "0191089f-5799-79b0-95b1-d04b339a1a64",
+        "name":  "г. Рига, Lidl Lapsu",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-07-31T12:06:23Z"
+    },
+    {
+        "id":  "019108c0-7324-7abe-952f-a6307b4279ed",
+        "name":  "г. Рига, Lidl Kuldiga",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-07-31T12:26:59Z"
+    },
+    {
+        "id":  "01910e5a-6368-7bf5-9bd4-51929849c394",
+        "name":  "г. Рига, Lidl Kisezera",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-08-01T14:36:08Z"
+    },
+    {
+        "id":  "019146fe-1b6a-7c43-b2fc-2a1090f60e7e",
+        "name":  "ФОК на Приморском",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  1108.27,
+        "summa":  471070.16,
+        "date":  "2024-08-12T14:37:23Z"
+    },
+    {
+        "id":  "01914baa-cc1a-7842-9068-6a4efd572f81",
+        "name":  "г. Рига, Burtnieku 37",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-08-13T12:18:45Z"
+    },
+    {
+        "id":  "01914fb1-50e2-7656-81d1-e0ac132f7b0d",
+        "name":  "ЖК Ривер парк 2",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  8303.56,
+        "summa":  16374953.83,
+        "date":  "2024-08-14T07:33:50Z"
+    },
+    {
+        "id":  "01915a7c-3b6c-7d6a-849a-2bebc1d6e821",
+        "name":  "г. Рига, Maxima",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-08-16T09:22:08Z"
+    },
+    {
+        "id":  "0191e17d-f23f-739d-953d-8963dbffc8b2",
+        "name":  "ЖК Город Звезд 3 оч. (Фасады)",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  30494.31,
+        "summa":  133091693.76,
+        "date":  "2024-09-11T14:41:08Z"
+    },
+    {
+        "id":  "0191fb2e-0e92-7a2a-8169-437bf8c95903",
+        "name":  "Сосновая поляна, ФОК",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  560.42,
+        "summa":  6623458.27,
+        "date":  "2024-09-16T14:22:19Z"
+    },
+    {
+        "id":  "01920923-141c-7703-b65f-6723ade330c1",
+        "name":  "NRG, г. Ташкент, ЖК Maftun Makon 3",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-09-19T07:19:57Z"
+    },
+    {
+        "id":  "01920961-8a1b-738e-a515-3080a167cc31",
+        "name":  "г. Рига, LU",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-09-19T08:26:44Z"
+    },
+    {
+        "id":  "01920a12-5547-7cf3-9aad-42f129f819cf",
+        "name":  "г. Рига, Bierens Būve Memele 4",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-09-19T11:39:00Z"
+    },
+    {
+        "id":  "01921dff-0acd-7253-b21a-5ddaf8644e92",
+        "name":  "г. Рига, Pro Dev Stradini",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-09-23T08:30:25Z"
+    },
+    {
+        "id":  "01922304-4251-7b32-a04c-10671130ce51",
+        "name":  "ЖК Дворцовый фасад, К2.1, сек. 1.1-1.2",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-09-24T08:13:24Z"
+    },
+    {
+        "id":  "0192473b-933f-7208-92d3-706fbd81bc7a",
+        "name":  "Новоселье поз.10к4",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  1313.18,
+        "summa":  4950215.86,
+        "date":  "2024-10-01T09:29:00Z"
+    },
+    {
+        "id":  "01924ca0-2504-75d9-b5cf-9904cba72c69",
+        "name":  "ЖК Янино 1 (кор. \"В\" и кор.\"Г\")",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  27367.82,
+        "summa":  19309435.99,
+        "date":  "2024-10-02T10:44:26Z"
+    },
+    {
+        "id":  "019265c4-4f2c-72b7-9705-a48bf6452dd9",
+        "name":  "г. Рига, Pinki football",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-10-07T07:00:48Z"
+    },
+    {
+        "id":  "01929466-94b7-7a03-8c3f-18d5463e2b2d",
+        "name":  "г. Сочи, частный дом, Марк",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-10-16T08:21:29Z"
+    },
+    {
+        "id":  "0192b478-c1f5-7aa9-bd48-aece46d140f5",
+        "name":  "г. Рига, HANZAS 3B",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-10-22T13:46:39Z"
+    },
+    {
+        "id":  "0192c300-e19b-7066-9551-b60157feb53b",
+        "name":  "Лаврики 6, ПВХ ремонт",
+        "tip_code":  "rm_remontnye_raboty",
+        "tip_name":  "РМ – Ремонтные работы",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-10-25T09:31:11Z"
+    },
+    {
+        "id":  "0192c30c-a004-7284-b2d4-0c5414419684",
+        "name":  "Лаврики 6, ПВХ сдача",
+        "tip_code":  "rm_remontnye_raboty",
+        "tip_name":  "РМ – Ремонтные работы",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-10-25T09:46:31Z"
+    },
+    {
+        "id":  "0192d1ca-3037-7c0e-ad69-91ee4fd31f39",
+        "name":  "ЖК Кв. 100, (4 оч.)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  2003.3,
+        "summa":  10829648.09,
+        "date":  "2024-10-28T06:38:38Z"
+    },
+    {
+        "id":  "0192d1f1-2523-7117-8cb6-17c5f53539a8",
+        "name":  "г. Ташкент, БЦ Санкт-Петербург",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-10-28T07:07:39Z"
+    },
+    {
+        "id":  "01930aaf-be94-7130-886b-3d6c007bdef5",
+        "name":  "г. Рига, Aviacijas 2E",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-11-08T07:34:51Z"
+    },
+    {
+        "id":  "01930ab6-f0b2-7c04-bff5-1442a5e77492",
+        "name":  "г. Рига, Balasta Dambis",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-11-08T07:41:28Z"
+    },
+    {
+        "id":  "01933f2a-889f-7880-9481-c6fa399b6d9d",
+        "name":  "Бугры к.18 (С1, С2, С3, С4)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  6978.69,
+        "summa":  14594813.54,
+        "date":  "2024-11-18T12:33:03Z"
+    },
+    {
+        "id":  "01933fc5-876e-722d-bead-e444599118c3",
+        "name":  "г. Рига, Виллы KAIGAN",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-11-18T15:01:46Z"
+    },
+    {
+        "id":  "01936796-cd1c-7224-ac35-9338c5474321",
+        "name":  "ЖК \"Остров\"",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  7764.38,
+        "summa":  25595836.72,
+        "date":  "2024-11-26T08:48:17Z"
+    },
+    {
+        "id":  "0193684c-0970-7446-892c-f1838db094b6",
+        "name":  "г. Рига, VC4",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-11-26T11:51:08Z"
+    },
+    {
+        "id":  "0193b9b3-07b1-7228-a856-3ca5e026d373",
+        "name":  "NRG, г. Ташкент, ЖК Maftun Business-1",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2024-12-12T07:14:16Z"
+    },
+    {
+        "id":  "01940ce0-0545-71c9-8ad1-5535ad48e223",
+        "name":  "ЖК Южный",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  895.13,
+        "summa":  5032277.64,
+        "date":  "2024-12-28T10:52:39Z"
+    },
+    {
+        "id":  "01948423-35b5-71bc-ab8b-14bef7ab2ad2",
+        "name":  "ЖК Эдельвейс. Янино",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  1408.57,
+        "summa":  5888441.65,
+        "date":  "2025-01-20T14:42:11Z"
+    },
+    {
+        "id":  "01948791-cfba-7413-a96a-12cf7d3703be",
+        "name":  "г. Рига, Kaplavas iela 4c",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-01-21T06:36:21Z"
+    },
+    {
+        "id":  "0194ad55-9eba-7785-800b-28271711ad42",
+        "name":  "Hanzas 3B",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-01-28T14:37:56Z"
+    },
+    {
+        "id":  "0194bcfc-c91d-76b7-8d36-e52ad6173d34",
+        "name":  "жк \"RESPECT\"",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-01-31T15:56:46Z"
+    },
+    {
+        "id":  "0194cbed-409f-7441-8810-d0b00405648e",
+        "name":  "ЖК Янино 1 (корп. \"В\" ) СМР, хол. витражи",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  7843.01,
+        "summa":  15764920.68,
+        "date":  "2025-02-03T13:17:02Z"
+    },
+    {
+        "id":  "0194cc01-5e52-774e-b3bd-569b8ad990c5",
+        "name":  "ЖК Янино 1 (корп. \"В\") СМР, тёплые витражи",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  51.87,
+        "summa":  114759.26,
+        "date":  "2025-02-03T13:42:00Z"
+    },
+    {
+        "id":  "0194d0fe-2a95-70fb-900a-840b91055a98",
+        "name":  "ЖК \"Окла\" (Корпус 5.3.1) Витражи",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  5154.26,
+        "summa":  27243521.38,
+        "date":  "2025-02-04T12:56:58Z"
+    },
+    {
+        "id":  "01952220-d2ff-75dc-8d6f-23ade0750e7f",
+        "name":  "БЦ \"INSIDE\" (реконструкция)_СМР",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-02-20T07:24:12Z"
+    },
+    {
+        "id":  "01954601-411d-74a1-bac0-27c18e18d339",
+        "name":  "ЖК «Алексеевский квартал» (корп. 10.7)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  1562.42,
+        "summa":  6645315.49,
+        "date":  "2025-02-27T06:18:36Z"
+    },
+    {
+        "id":  "019546a3-cf12-737d-9332-16d4cc61725d",
+        "name":  "ЖК Дворцовый фасад 3оч. к.3.3",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  2038.98,
+        "summa":  5660881.34,
+        "date":  "2025-02-27T09:16:30Z"
+    },
+    {
+        "id":  "01955afa-3e1d-717f-b583-41c1272d5b04",
+        "name":  "LVS BUILDING ČUIBES 17",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-03-03T07:56:44Z"
+    },
+    {
+        "id":  "019564f4-6731-7148-b484-f907072f3f55",
+        "name":  "\"Сердце Востока\" (секции 4-6)",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-03-05T06:27:41Z"
+    },
+    {
+        "id":  "01956f34-f9ab-749b-a208-b630d81d38db",
+        "name":  "ЖК Эдельвейс г.Выборг (1 этажи)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  159,
+        "summa":  667807.95,
+        "date":  "2025-03-07T06:15:30Z"
+    },
+    {
+        "id":  "01959354-c09f-745c-b1d6-c0b71a2a281a",
+        "name":  "ЖК \"Univer City\". Корп 2 (Фасады)",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  4963.09,
+        "summa":  21053228.88,
+        "date":  "2025-03-14T06:34:04Z"
+    },
+    {
+        "id":  "019593af-b475-761f-9715-74c418cefe10",
+        "name":  "ЖК Янино 1 (корп.\"Г\") СМР, хол. витражи",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  7793.3,
+        "summa":  15634217.06,
+        "date":  "2025-03-14T08:31:53Z"
+    },
+    {
+        "id":  "019593c8-d274-727a-aaa4-24f1502d1807",
+        "name":  "ЖК Янино 1 (корп.\"Г\") СМР, тёплые витражи",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-03-14T08:37:01Z"
+    },
+    {
+        "id":  "0195c80c-31c0-7620-a361-e1357ad19887",
+        "name":  "ЖК \"ALL IN 3.0\" (Двери)",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  363.33,
+        "summa":  4181543.17,
+        "date":  "2025-03-24T12:14:57Z"
+    },
+    {
+        "id":  "0195d23b-df7a-7290-99cc-9c2805dff987",
+        "name":  "Воскресная школа",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-03-26T11:40:23Z"
+    },
+    {
+        "id":  "0195d240-f3a5-75e8-a786-99dd98681a5c",
+        "name":  "Сестринский дом",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-03-26T11:42:32Z"
+    },
+    {
+        "id":  "0196154a-ee55-700b-b696-6bc965a54c39",
+        "name":  "Общежитие для сотрудников онкологической больницы ",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  1537.1,
+        "summa":  8037895.55,
+        "date":  "2025-04-08T12:14:59Z"
+    },
+    {
+        "id":  "0196155b-3d21-7639-bb38-0e247f076380",
+        "name":  "ЖК Парадный ансамбль , 6 оч.  ( кор. 6.6,  кор .6.7) Витражи",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-04-08T12:41:07Z"
+    },
+    {
+        "id":  "019623da-2758-77b6-9688-9f7fc06b6819",
+        "name":  "Лаврики 3. Ремонт",
+        "tip_code":  "rm_remontnye_raboty",
+        "tip_name":  "РМ – Ремонтные работы",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-04-11T08:09:22Z"
+    },
+    {
+        "id":  "01962400-ef40-7662-ad2c-1c07daae9a1c",
+        "name":  "Лаврики 3. Доделки",
+        "tip_code":  "rm_remontnye_raboty",
+        "tip_name":  "РМ – Ремонтные работы",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-04-11T08:46:56Z"
+    },
+    {
+        "id":  "0196242c-9dd1-70c2-8fc6-c8a0a34a9bc3",
+        "name":  "Лаврики 6. Ремонт",
+        "tip_code":  "rm_remontnye_raboty",
+        "tip_name":  "РМ – Ремонтные работы",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-04-11T09:32:20Z"
+    },
+    {
+        "id":  "01963863-5a17-7010-b4ad-77f76af78cd6",
+        "name":  "ЖК Flagman",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  1219.54,
+        "summa":  599525.86,
+        "date":  "2025-04-15T07:42:18Z"
+    },
+    {
+        "id":  "01964384-c6ed-73b9-b872-a150eed7922f",
+        "name":  "Leaves (Шахты ДУ)",
+        "tip_code":  "pr_prochee",
+        "tip_name":  "ПР – Прочее",
+        "kvadratura":  16,
+        "summa":  238717.44,
+        "date":  "2025-04-17T11:40:07Z"
+    },
+    {
+        "id":  "0196479b-1567-7749-8497-bc52128a452d",
+        "name":  "DEPO Liepāja",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-04-18T06:37:14Z"
+    },
+    {
+        "id":  "01967d0b-1698-7173-8f05-3d4da62ebdc5",
+        "name":  "ЖК Univer City. Корп 12 (Фасады)",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  19169.49,
+        "summa":  56806714.55,
+        "date":  "2025-04-28T15:42:57Z"
+    },
+    {
+        "id":  "019681be-bf5e-7609-8d7d-ff3ed918c324",
+        "name":  "ЖК Кв. 100, (5 оч.)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  1525.68,
+        "summa":  9286813.49,
+        "date":  "2025-04-29T13:43:40Z"
+    },
+    {
+        "id":  "019681ca-3c00-7238-b8aa-cfb1deddf44f",
+        "name":  "ЖК Кв. 100, (6 оч.)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  5606.29,
+        "summa":  31097661.38,
+        "date":  "2025-04-29T13:47:54Z"
+    },
+    {
+        "id":  "019681ce-1671-7394-ab85-27b8029b3674",
+        "name":  "ЖК Кв. 100, (7 оч.)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  6499.74,
+        "summa":  33478660.43,
+        "date":  "2025-04-29T13:54:08Z"
+    },
+    {
+        "id":  "0196e853-5345-704d-bb33-8d04d2a7adc8",
+        "name":  "Negocio Ogre Hospital",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-05-19T11:37:12Z"
+    },
+    {
+        "id":  "0196e860-a4b2-71fc-b9d2-358457acd08d",
+        "name":  "Depo Liepaja",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-05-19T11:52:21Z"
+    },
+    {
+        "id":  "019716af-93cc-737a-a4ae-7132f51139e6",
+        "name":  "ЖК Сосновый бор 2 (СК Аврора)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-05-28T11:51:29Z"
+    },
+    {
+        "id":  "019734ae-cfae-77eb-a533-9dbcea3fd592",
+        "name":  "JK flooring private house",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-06-03T07:28:37Z"
+    },
+    {
+        "id":  "01973b7d-272c-7233-9ffa-507b98c9b1cc",
+        "name":  "ЖК «Алексеевский квартал» (корп. 10.3)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  1191.21,
+        "summa":  5159572.64,
+        "date":  "2025-06-04T15:29:43Z"
+    },
+    {
+        "id":  "01975fdb-c663-7345-afab-a958c92f551b",
+        "name":  "Онегин Парк 2",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  369.42,
+        "summa":  10531935.16,
+        "date":  "2025-06-11T16:42:54Z"
+    },
+    {
+        "id":  "01978c04-da9e-72df-a275-edb52c9f28c1",
+        "name":  "ОДК-Климов",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-06-20T06:36:30Z"
+    },
+    {
+        "id":  "0197c54b-a660-765d-bfde-91ec18f0ef4b",
+        "name":  "ЖК Город звёзд (8оч.)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  9428.47,
+        "summa":  32046520.97,
+        "date":  "2025-07-01T09:27:35Z"
+    },
+    {
+        "id":  "0197e4da-29f0-7554-84b1-3ada6815b7d3",
+        "name":  "ЖК «Алексеевский квартал» (корп. 10.4)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  1243.85,
+        "summa":  5402222.82,
+        "date":  "2025-07-07T12:29:06Z"
+    },
+    {
+        "id":  "0197e923-5f5f-73f6-932c-cc66f87031bc",
+        "name":  "ОДК-Климов (зенитные фонари)",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  1993.2,
+        "summa":  25776142.13,
+        "date":  "2025-07-08T08:33:08Z"
+    },
+    {
+        "id":  "0197f91c-4ca0-75cd-8fa7-24540656870c",
+        "name":  "NRG, ЖК Park, Двери",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  28.78,
+        "summa":  62796.23,
+        "date":  "2025-07-11T10:54:08Z"
+    },
+    {
+        "id":  "019808bb-6379-75ec-9246-fda817658491",
+        "name":  "ЖК Парадный ансамбль (7 оч.) ВХ",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  15002.14,
+        "summa":  50722685.40,
+        "date":  "2025-07-14T11:50:03Z"
+    },
+    {
+        "id":  "019818e5-c1d6-71a1-aed5-8ee7d0431359",
+        "name":  "ЖК Парадный ансамбль 7 оч.(К 7.8, 7.9, 7.12) Фасады",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  16992.01,
+        "summa":  48571049.33,
+        "date":  "2025-07-17T15:10:28Z"
+    },
+    {
+        "id":  "01983201-94b5-7009-8c1f-0db62e34aba7",
+        "name":  "г. Павловский Посад, частный дом",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  26.74,
+        "summa":  80879.68,
+        "date":  "2025-07-22T12:11:36Z"
+    },
+    {
+        "id":  "01985b7e-3097-7358-bd26-23a9599c208c",
+        "name":  "Лаврики 3. Заселение",
+        "tip_code":  "rm_remontnye_raboty",
+        "tip_name":  "РМ – Ремонтные работы",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-07-30T13:22:57Z"
+    },
+    {
+        "id":  "019865cc-911b-706a-904a-5a676411de6a",
+        "name":  "ЖК «Аквилон VERBA» СМР",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  8109.35,
+        "summa":  6617001.74,
+        "date":  "2025-08-01T13:26:05Z"
+    },
+    {
+        "id":  "019888a7-0194-75ef-9575-a8b684b93f08",
+        "name":  "Залив корп. 15,16 (СМР, Алютеч двери).",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  49.95,
+        "summa":  237349.91,
+        "date":  "2025-08-08T07:53:37Z"
+    },
+    {
+        "id":  "0198a1ed-948f-7423-85a4-75bf0d81bf12",
+        "name":  "ЖК Город звёзд (9оч.) Витражи  ",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  2330.8,
+        "summa":  8137405.50,
+        "date":  "2025-08-13T05:43:26Z"
+    },
+    {
+        "id":  "0198c2b0-fbf9-7548-83f6-b2871e31f9d3",
+        "name":  "ЖК Эдельвейс. Выборг (Стеклянные Козырьки) ",
+        "tip_code":  "sk_steklyannye_kozyrki",
+        "tip_name":  "СК – Стеклянные Козырьки",
+        "kvadratura":  29.79,
+        "summa":  558028.96,
+        "date":  "2025-08-19T14:24:03Z"
+    },
+    {
+        "id":  "0198eb6d-4123-762c-b3a5-2cba1bc5378c",
+        "name":  "Respect 3 очередь ",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  3163.95,
+        "summa":  13643297.07,
+        "date":  "2025-08-27T14:07:27Z"
+    },
+    {
+        "id":  "0198f4c1-8a0c-73db-8f65-b1ecc5cfe0b4",
+        "name":  "Leaves (обрамление дверей)",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-08-29T07:40:27Z"
+    },
+    {
+        "id":  "0199040a-e6a4-7459-8ebc-eebb1e855639",
+        "name":  "Гостиница",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  464.17,
+        "summa":  9781041.30,
+        "date":  "2025-09-01T06:53:50Z"
+    },
+    {
+        "id":  "01993928-b434-7444-918c-79b8aeb850ba",
+        "name":  "ЖК Остров (НВФ, СМР)",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-09-11T15:35:38Z"
+    },
+    {
+        "id":  "019951ee-bdff-719d-acff-54917c800858",
+        "name":  "Ангар СТО",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  29.8,
+        "summa":  32603.29,
+        "date":  "2025-09-16T09:54:22Z"
+    },
+    {
+        "id":  "0199f2ca-86e8-7737-87cc-93df9e6e0681",
+        "name":  "ЖК «Янила Форест» (уч.13 корп. 2)",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  2067.2,
+        "summa":  14326998.92,
+        "date":  "2025-10-17T15:35:54Z"
+    },
+    {
+        "id":  "019a71b1-59bd-7300-84ca-3f33b4ec0de0",
+        "name":  "Офис на Литейном",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  22.1,
+        "summa":  23690.76,
+        "date":  "2025-11-11T07:09:07Z"
+    },
+    {
+        "id":  "019a977c-34f5-7039-b669-9cb4cd7b2139",
+        "name":  "Дверь, офис, ул. Правды 14",
+        "tip_code":  "vt_vitrazhi_tyoplye",
+        "tip_name":  "ВТ – Витражи Тёплые",
+        "kvadratura":  8,
+        "summa":  22076.8,
+        "date":  "2025-11-18T15:14:08Z"
+    },
+    {
+        "id":  "019ac040-7c71-708d-bddd-1ce4096ca25d",
+        "name":  "БЦ ЛОКУС (ПМ - КМ)",
+        "tip_code":  "pm_-_postavka_materialov",
+        "tip_name":  "ПМ - Поставка материалов",
+        "kvadratura":  3324.97,
+        "summa":  299247.30,
+        "date":  "2025-11-26T13:18:02Z"
+    },
+    {
+        "id":  "019ad921-f345-750a-8b2d-86c1f79c1e9f",
+        "name":  "ЖК Город звёзд (10оч.) Витражи",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  9288.49,
+        "summa":  25357484.82,
+        "date":  "2025-12-01T09:16:50Z"
+    },
+    {
+        "id":  "019adde8-dde5-744e-870b-73db576ea52a",
+        "name":  "ЖК Яркий (доделки)",
+        "tip_code":  "rm_remontnye_raboty",
+        "tip_name":  "РМ – Ремонтные работы",
+        "kvadratura":  1,
+        "summa":  829850,
+        "date":  "2025-12-02T07:22:48Z"
+    },
+    {
+        "id":  "019b0c60-2cb2-732c-aaa7-4c7b20c13b85",
+        "name":  "Leaves 2 сек.1 - 6 (НВФ)",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-12-11T08:03:43Z"
+    },
+    {
+        "id":  "019b4a6d-2d2a-76d8-9209-3e9b5bb3f32d",
+        "name":  "Портал AURORA HS-180 (образцы)",
+        "tip_code":  "vo_vitrazh_obrazec",
+        "tip_name":  "ВО – Витраж Образец",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2025-12-23T09:01:00Z"
+    },
+    {
+        "id":  "019be4f3-d9e1-768a-a8fe-9da8f2ff4888",
+        "name":  "Брусника (НВЕ 03), 18009-ТУ",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2026-01-22T09:34:43Z"
+    },
+    {
+        "id":  "019bf9ec-b03b-74a2-8fe0-62de40799e30",
+        "name":  "Брусника (НВЕ 01), 18051-ТУ",
+        "tip_code":  "vkh_vitrazhi_kholodnye",
+        "tip_name":  "ВХ – Витражи Холодные",
+        "kvadratura":  0,
+        "summa":  0,
+        "date":  "2026-01-26T10:54:57Z"
+    },
+    {
+        "id":  "019c7074-6845-763b-915e-0398c19ab03c",
+        "name":  "ОДК-Климов (стеклянные козырьки)",
+        "tip_code":  "sk_steklyannye_kozyrki",
+        "tip_name":  "СК – Стеклянные Козырьки",
+        "kvadratura":  59.7,
+        "summa":  1099848.92,
+        "date":  "2026-02-18T11:20:28Z"
+    },
+    {
+        "id":  "019dce0a-1c7b-71e4-b3aa-7059ca6e8790",
+        "name":  "Leaves 2 сек.1 - 6 (НВФ) Часть 2",
+        "tip_code":  "vf_ventiliruemye_fasady",
+        "tip_name":  "ВФ – Вентилируемые Фасады",
+        "kvadratura":  2749.06,
+        "summa":  1001262.63,
+        "date":  "2026-04-27T08:32:59Z"
+    }
+];
+
+const tipShort = {
+  'vkh_vitrazhi_kholodnye': 'ВХ',
+  'vt_vitrazhi_tyoplye': 'ВТ',
+  'pm_-_postavka_materialov': 'ПМ',
+  'vf_ventiliruemye_fasady': 'ВФ',
+  'rm_remontnye_raboty': 'РМ',
+  'sk_steklyannye_kozyrki': 'СК',
+  'mf_mokrye_fasady_shtukaturnye': 'МФ',
+  'pr_prochee': 'ПР',
+  'tkh_vitrazhi_tyoplo-kholodnye': 'ТХ',
+  'vo_vitrazh_obrazec': 'ВО'
+};
+
+function getShort(code) { return tipShort[code] || code; }
+
+function fmtNum(n) {
+  if (n === 0 || n === null || n === undefined) return '0';
+  return n.toLocaleString('ru-RU', { maximumFractionDigits: 2, minimumFractionDigits: 0 });
+}
+
+function fmtMoney(n) {
+  if (n === 0 || n === null || n === undefined) return '0 ₽';
+  return n.toLocaleString('ru-RU', { maximumFractionDigits: 2, minimumFractionDigits: 0 }) + ' ₽';
+}
+
+function fmtDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('ru-RU');
+}
+
+let areaChartInstance = null;
+let sumChartInstance = null;
+
+function applyFilter() {
+  const from = document.getElementById('dateFrom').value;
+  const to = document.getElementById('dateTo').value;
+
+  let filtered = rawData;
+
+  if (from) {
+    const fromDate = new Date(from);
+    filtered = filtered.filter(d => new Date(d.date) >= fromDate);
+  }
+  if (to) {
+    const toDate = new Date(to);
+    toDate.setHours(23, 59, 59, 999);
+    filtered = filtered.filter(d => new Date(d.date) <= toDate);
+  }
+
+  const groups = {};
+  for (const item of filtered) {
+    const key = item.tip_code;
+    if (!groups[key]) {
+      groups[key] = { tip_code: key, tip_name: item.tip_name, area: 0, sum: 0, count: 0 };
+    }
+    groups[key].area += item.kvadratura || 0;
+    groups[key].sum += item.summa || 0;
+    groups[key].count++;
+  }
+
+  const sorted = Object.values(groups).sort((a, b) => b.sum - a.sum);
+
+  const totalArea = sorted.reduce((s, g) => s + g.area, 0);
+  const totalSum = sorted.reduce((s, g) => s + g.sum, 0);
+  const totalCount = filtered.length;
+  const avgCost = totalCount > 0 ? totalSum / totalCount : 0;
+
+  document.getElementById('summaryCards').innerHTML = `
+    <div class="summary-card"><div class="label">Всего тендеров</div><div class="value">${totalCount}</div></div>
+    <div class="summary-card"><div class="label">Общая площадь, м²</div><div class="value">${fmtNum(totalArea)}</div></div>
+    <div class="summary-card"><div class="label">Общая сумма, ₽</div><div class="value">${fmtMoney(totalSum)}</div></div>
+    <div class="summary-card"><div class="label">Средняя стоимость тендера, ₽</div><div class="value">${fmtMoney(avgCost)}</div></div>
+  `;
+
+  if (from || to) {
+    document.getElementById('infoText').textContent = `Период: ${from || 'начало'} — ${to || 'настоящее'}, найдено ${totalCount} тендеров`;
+  } else {
+    document.getElementById('infoText').textContent = `Всего ${totalCount} выигранных тендеров`;
+  }
+
+  let tableHtml = '';
+  for (const g of sorted) {
+    const avg = g.count > 0 ? g.sum / g.count : 0;
+    const shortCode = getShort(g.tip_code);
+    tableHtml += `<tr>
+      <td><span class="badge badge-${shortCode}">${shortCode}</span> ${g.tip_name}</td>
+      <td class="num">${fmtNum(g.area)}</td>
+      <td class="num">${fmtMoney(avg)}</td>
+      <td class="num">${fmtMoney(g.sum)}</td>
+      <td class="num">${g.count}</td>
+    </tr>`;
+  }
+  const totalAvg = totalCount > 0 ? totalSum / totalCount : 0;
+  tableHtml += `<tr class="total">
+    <td>ИТОГО</td>
+    <td class="num">${fmtNum(totalArea)}</td>
+    <td class="num">${fmtMoney(totalAvg)}</td>
+    <td class="num">${fmtMoney(totalSum)}</td>
+    <td class="num">${totalCount}</td>
+  </tr>`;
+
+  document.getElementById('tableBody').innerHTML = tableHtml;
+
+  const labels = sorted.map(g => getShort(g.tip_code));
+  const areaData = sorted.map(g => Math.round(g.area * 100) / 100);
+  const sumData = sorted.map(g => Math.round(g.sum * 100) / 100);
+  const colors = ['#6c5ce7','#00b894','#e17055','#0984e3','#d63031','#a855f7','#16a34a','#636e72','#2563eb','#fdcb6e'];
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('ru-RU') } },
+      x: { grid: { display: false } }
+    }
+  };
+
+  if (areaChartInstance) areaChartInstance.destroy();
+  areaChartInstance = new Chart(document.getElementById('areaChart'), {
+    type: 'bar',
+    data: { labels, datasets: [{ data: areaData, backgroundColor: colors.slice(0, labels.length), borderRadius: 4 }] },
+    options: chartOptions
+  });
+
+  if (sumChartInstance) sumChartInstance.destroy();
+  sumChartInstance = new Chart(document.getElementById('sumChart'), {
+    type: 'bar',
+    data: { labels, datasets: [{ data: sumData, backgroundColor: colors.slice(0, labels.length), borderRadius: 4 }] },
+    options: chartOptions
+  });
+
+  let detailHtml = '';
+  const detail = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  for (const item of detail) {
+    const shortCode = getShort(item.tip_code);
+    detailHtml += `<tr>
+      <td>${item.name}</td>
+      <td><span class="badge badge-${shortCode}">${shortCode}</span></td>
+      <td class="num">${fmtNum(item.kvadratura)}</td>
+      <td class="num">${fmtMoney(item.summa)}</td>
+      <td>${fmtDate(item.date)}</td>
+    </tr>`;
+  }
+  document.getElementById('detailBody').innerHTML = detailHtml;
+  document.getElementById('detailCount').textContent = detail.length + ' записей';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  const start = new Date(now.getFullYear() - 2, 0, 1);
+  document.getElementById('dateFrom').valueAsDate = start;
+  document.getElementById('dateTo').valueAsDate = now;
+  applyFilter();
+});
+</script>
+</body>
+</html>

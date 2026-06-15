@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Работы по тендерам — Дашборд</title>
+<script src="data.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;--card:#fff;--primary:#1a73e8;--primary-light:#e8f0fe;
+  --text:#1c1e21;--muted:#5f6368;--border:#dadce0;--green:#188038;--red:#d93025;
+  --orange:#e37400;--shadow:0 1px 3px rgba(0,0,0,.12);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.4;padding:0;-webkit-font-smoothing:antialiased}
+
+/* header */
+.header{background:var(--primary);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:16px;font-weight:600}
+.header .date-badge{font-size:11px;opacity:.8}
+
+/* tabs */
+.tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:44px;z-index:9;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{padding:10px 14px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:.2s;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab:active{opacity:.6}
+
+/* content */
+.content{display:none;padding:12px}
+.content.active{display:block}
+
+/* kpi */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi-card{background:var(--card);border-radius:10px;padding:14px;box-shadow:var(--shadow)}
+.kpi-card .label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.kpi-card .value{font-size:20px;font-weight:700;color:var(--text)}
+.kpi-card .value.green{color:var(--green)}
+.kpi-card .sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* filters */
+.filters{background:var(--card);border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:var(--shadow)}
+.filters .row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.filters .row:last-child{margin-bottom:0}
+.filters .label{font-size:11px;color:var(--muted);width:100%;margin-bottom:2px}
+.chip{padding:5px 10px;border-radius:16px;border:1px solid var(--border);background:var(--bg);font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.15s;user-select:none;flex-shrink:0}
+.chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.chip:active{transform:scale(.95)}
+
+/* stat cards grid */
+.stat-grid{display:grid;gap:8px}
+.stat-card{background:var(--card);border-radius:10px;padding:14px;box-shadow:var(--shadow);cursor:pointer;transition:.2s;-webkit-tap-highlight-color:transparent}
+.stat-card:active{transform:scale(.97)}
+.stat-card .title{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text)}
+.stat-card .metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.stat-card .m-item .m-label{font-size:10px;color:var(--muted)}
+.stat-card .m-item .m-val{font-size:14px;font-weight:600}
+
+
+
+/* empty state */
+.empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px}
+
+@media(max-width:480px){
+  .stat-card .metrics{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Работы по тендерам</h1>
+  <span class="date-badge" id="headerDate"></span>
+</div>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" data-tab="0">Сводная</div>
+  <div class="tab" data-tab="1">По тендерам</div>
+  <div class="tab" data-tab="2">По ответственным</div>
+</div>
+
+<!-- Tab 0: Summary -->
+<div class="content active" data-content="0">
+  <div class="kpis" id="kpi0"></div>
+  <div class="filters" id="filters0"></div>
+  <div class="stat-grid" id="usersGrid"></div>
+</div>
+
+<!-- Tab 1: By Tender -->
+<div class="content" data-content="1">
+  <div class="kpis" id="kpi1"></div>
+  <div class="filters" id="filters1"></div>
+  <div class="stat-grid" id="tenderGrid"></div>
+</div>
+
+<!-- Tab 2: By Responsible -->
+<div class="content" data-content="2">
+  <div class="kpis" id="kpi2"></div>
+  <div class="filters" id="filters2"></div>
+  <div class="stat-grid" id="respGrid"></div>
+</div>
+
+<script>
+// Data is in D array loaded from data.js
+// Index: 0=id,1=name,2=type,3=object,4=tender,5=init,6=resp,7=rp,8=area,9=cost,10=pm2,11=year,12=month
+
+const I={id:0,name:1,type:2,obj:3,tender:4,init:5,resp:6,rp:7,area:8,cost:9,pm2:10,year:11,month:12};
+
+function fmtNum(n){return n===0?'0':new Intl.NumberFormat('ru-RU').format(Math.round(n))}
+function fmtCur(n){return n===0?'0 ₽':new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:0}).format(n)}
+
+
+// State per tab
+const state={
+  0:{year:null,month:null,type:null},
+  1:{year:null,month:null},
+  2:{year:null,month:null}
+};
+let activeTab=0;
+
+function getData(){
+  return D.filter(r=>r[I.area]>0||r[I.cost]>0);
+}
+
+function filterData(tabIdx){
+  const s=state[tabIdx];
+  return getData().filter(r=>{
+    if(s.year&&r[I.year]!==s.year)return false;
+    if(s.month&&r[I.month]!==s.month)return false;
+    if(s.type&&r[I.type]!==s.type)return false;
+    return true;
+  });
+}
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(el=>{
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    activeTab=parseInt(el.dataset.tab);
+    document.querySelector('[data-content="'+activeTab+'"]').classList.add('active');
+    render(activeTab);
+  });
+});
+
+function renderKPI(tabId,data,totalAny){
+  const area=data.reduce((s,r)=>s+r[I.area],0);
+  const cost=data.reduce((s,r)=>s+r[I.cost],0);
+  const cnt=data.length;
+  const avg=area>0?cost/area:0;
+  const eff=avg>0?(cost/avg)/area:0;
+  document.getElementById('kpi'+tabId).innerHTML=
+    '<div class="kpi-card"><div class="label">Площадь</div><div class="value">'+fmtNum(area)+' <span style="font-size:12px;font-weight:400">м²</span></div></div>'+
+    '<div class="kpi-card"><div class="label">Общая стоимость</div><div class="value">'+fmtCur(cost)+'</div><div class="sub">средняя '+fmtCur(avg)+'/м²</div></div>'+
+    '<div class="kpi-card"><div class="label">Работ с данными</div><div class="value green">'+fmtNum(cnt)+'</div><div class="sub">всего в системе: '+fmtNum(totalAny)+'</div></div>'+
+    '<div class="kpi-card"><div class="label">Цена за м²</div><div class="value">'+fmtCur(avg)+'</div></div>';
+}
+
+function renderFilters(tabId,data){
+  const s=state[tabId];
+  const years=[...new Set(data.map(r=>r[I.year]))].filter(y=>y).sort((a,b)=>b-a);
+  const months=[...new Set(data.map(r=>r[I.month]))].filter(m=>m).sort((a,b)=>a-b);
+  const types=[...new Set(data.map(r=>r[I.type]))].filter(t=>t&&t!=='Не указан').sort();
+  let html='';
+  if(years.length){
+    html+='<div class="row"><span class="label">Год</span>'+
+      years.map(y=>'<span class="chip'+(s.year===y?' active':'')+'" onclick="setFilter('+tabId+',\'year\','+y+')">'+y+'</span>').join('')+'</div>';
+  }
+  if(months.length){
+    html+='<div class="row"><span class="label">Месяц</span>'+
+      months.map(m=>'<span class="chip'+(s.month===m?' active':'')+'" onclick="setFilter('+tabId+',\'month\','+m+')">'+String(m).padStart(2,'0')+'</span>').join('')+'</div>';
+  }
+  if(types.length&&tabId===0){
+    html+='<div class="row"><span class="label">Тип работ</span>'+
+      types.map(t=>'<span class="chip'+(s.type===t?' active':'')+'" onclick="setFilter('+tabId+',\'type\',\''+t.replace(/'/g,"\\'")+'\')">'+t+'</span>').join('')+'</div>';
+  }
+  document.getElementById('filters'+tabId).innerHTML=html||'<div style="color:var(--muted);font-size:12px">Нет фильтров</div>';
+}
+
+function setFilter(tabId,key,val){
+  const s=state[tabId];
+  if(s[key]===val){s[key]=null}else{s[key]=val}
+  render(tabId);
+}
+
+// Tab 0: Summary by user (initiator)
+function renderTab0(){
+  const data=filterData(0);
+  renderKPI(0,data,D.length);
+  renderFilters(0,getData());
+
+  // Group by initiator
+  const groups={};
+  data.forEach(r=>{
+    const key=r[I.init]||'Не указан';
+    if(!groups[key])groups[key]={area:0,cost:0,cnt:0};
+    groups[key].area+=r[I.area];
+    groups[key].cost+=r[I.cost];
+    groups[key].cnt++;
+  });
+
+  const sorted=Object.entries(groups).sort((a,b)=>b[1].cost-a[1].cost);
+  const container=document.getElementById('usersGrid');
+  if(!sorted.length){container.innerHTML='<div class="empty">Нет данных</div>';return}
+
+  container.innerHTML=sorted.map(([name,m])=>{
+    const avg=m.area>0?m.cost/m.area:0;
+    return '<div class="stat-card">'+
+      '<div class="title">'+name+'</div>'+
+      '<div class="metrics">'+
+        '<div class="m-item"><div class="m-label">Площадь</div><div class="m-val">'+fmtNum(m.area)+' м²</div></div>'+
+        '<div class="m-item"><div class="m-label">Стоимость</div><div class="m-val">'+fmtCur(m.cost)+'</div></div>'+
+        '<div class="m-item"><div class="m-label">Работ</div><div class="m-val">'+fmtNum(m.cnt)+'</div></div>'+
+        '<div class="m-item"><div class="m-label">Средняя цена</div><div class="m-val">'+fmtCur(avg)+'/м²</div></div>'+
+      '</div></div>';
+  }).join('');
+}
+
+// Tab 1: By tender
+function renderTab1(){
+  const data=filterData(1);
+  renderKPI(1,data,D.length);
+  renderFilters(1,getData());
+
+  const groups={};
+  data.forEach(r=>{
+    const key=r[I.tender]||'Не указан';
+    if(!groups[key])groups[key]={area:0,cost:0,cnt:0,types:new Set()};
+    groups[key].area+=r[I.area];
+    groups[key].cost+=r[I.cost];
+    groups[key].cnt++;
+    groups[key].types.add(r[I.type]);
+  });
+
+  const sorted=Object.entries(groups).sort((a,b)=>b[1].cost-a[1].cost);
+  const container=document.getElementById('tenderGrid');
+  if(!sorted.length){container.innerHTML='<div class="empty">Нет данных</div>';return}
+
+  container.innerHTML=sorted.map(([name,m])=>{
+    const avg=m.area>0?m.cost/m.area:0;
+    const typesStr=[...m.types].filter(t=>t!=='Не указан').join(', ')||'—';
+    return '<div class="stat-card">'+
+      '<div class="title">'+name+'</div>'+
+      '<div class="metrics" style="grid-template-columns:1fr 1fr 1fr">'+
+        '<div class="m-item"><div class="m-label">Площадь</div><div class="m-val">'+fmtNum(m.area)+' м²</div></div>'+
+        '<div class="m-item"><div class="m-label">Стоимость</div><div class="m-val">'+fmtCur(m.cost)+'</div></div>'+
+        '<div class="m-item"><div class="m-label">Работ</div><div class="m-val">'+fmtNum(m.cnt)+'</div></div>'+
+        '<div class="m-item" style="grid-column:1/-1"><div class="m-label">Типы работ</div><div class="m-val" style="font-size:12px;font-weight:400">'+typesStr+'</div></div>'+
+      '</div></div>';
+  }).join('');
+}
+
+// Tab 2: By responsible person
+function renderTab2(){
+  const data=filterData(2);
+  renderKPI(2,data,D.length);
+  renderFilters(2,getData());
+
+  const groups={};
+  data.forEach(r=>{
+    const key=r[I.resp]||'Не указан';
+    if(!groups[key])groups[key]={area:0,cost:0,cnt:0,months:{}};
+    groups[key].area+=r[I.area];
+    groups[key].cost+=r[I.cost];
+    groups[key].cnt++;
+    const mKey=r[I.year]+'-'+String(r[I.month]).padStart(2,'0');
+    if(!groups[key].months[mKey])groups[key].months[mKey]={area:0,cnt:0};
+    groups[key].months[mKey].area+=r[I.area];
+    groups[key].months[mKey].cnt++;
+  });
+
+  const sorted=Object.entries(groups).sort((a,b)=>b[1].cost-a[1].cost);
+  const container=document.getElementById('respGrid');
+  if(!sorted.length){container.innerHTML='<div class="empty">Нет данных</div>';return}
+
+  container.innerHTML=sorted.map(([name,m])=>{
+    const avg=m.area>0?m.cost/m.area:0;
+    const monthsStr=Object.entries(m.months)
+      .sort((a,b)=>a[0].localeCompare(b[0]))
+      .slice(-6)
+      .map(([mk,md])=>'<span style="display:inline-block;margin:2px 4px 2px 0;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">'+mk+' — '+fmtNum(md.area)+' м² ('+md.cnt+' шт)</span>')
+      .join('');
+    return '<div class="stat-card">'+
+      '<div class="title">'+name+'</div>'+
+      '<div class="metrics">'+
+        '<div class="m-item"><div class="m-label">Площадь</div><div class="m-val">'+fmtNum(m.area)+' м²</div></div>'+
+        '<div class="m-item"><div class="m-label">Стоимость</div><div class="m-val">'+fmtCur(m.cost)+'</div></div>'+
+        '<div class="m-item"><div class="m-label">Работ</div><div class="m-val">'+fmtNum(m.cnt)+'</div></div>'+
+        '<div class="m-item"><div class="m-label">Средняя цена</div><div class="m-val">'+fmtCur(avg)+'/м²</div></div>'+
+      '</div>'+
+      '<div style="margin-top:8px;font-size:11px;color:var(--muted)"><div class="m-label">Последние месяцы</div><div style="margin-top:4px">'+monthsStr+'</div></div>'+
+      '</div>';
+  }).join('');
+}
+
+function render(tabId){
+  switch(tabId){
+    case 0:renderTab0();break;
+    case 1:renderTab1();break;
+    case 2:renderTab2();break;
+  }
+}
+
+// Init
+document.getElementById('headerDate').textContent=new Date().toLocaleDateString('ru-RU');
+render(0);
+</script>
+</body>
+</html>

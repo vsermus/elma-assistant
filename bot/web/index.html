@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELMA Bot</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">ELMA Bot</div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Агенты</div>
+      <div class="agent-list" id="agentList"></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Данные</div>
+      <div class="data-status" id="dataStatus">загрузка...</div>
+      <button class="refresh-btn" onclick="refreshData()">Обновить данные</button>
+    </div>
+    <div class="sidebar-footer">v0.1.0</div>
+  </div>
+  <div class="main">
+    <div class="chat-header">
+      <span>Чат с ELMA</span>
+      <span class="subtitle">спроси про тендеры, КМД, объекты</span>
+    </div>
+    <div class="messages" id="messages">
+      <div class="message bot">
+        <div class="msg-content">Привет! Я ELMA Bot. Спрашивай про тендеры, задания КМД, витражи, объекты или закажи выгрузку в Excel.</div>
+      </div>
+    </div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Напиши запрос..." autofocus>
+      <button onclick="sendMessage()" id="sendBtn">Отправить</button>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

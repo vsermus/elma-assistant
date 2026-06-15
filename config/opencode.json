@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "orchestrator",
+  "mcp": {
+    "xlwings": {
+      "type": "local",
+      "command": ["uvx", "mcp-server-xlwings"],
+      "enabled": true
+    }
+  }
+}

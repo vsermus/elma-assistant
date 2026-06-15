@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Отчёт по тендерам</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="data.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f6fa; color: #2d3436; padding: 30px; }
+.container { max-width: 1300px; margin: 0 auto; }
+h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; color: #1a1a2e; }
+.filters { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.filters .info { font-size: 13px; color: #636e72; margin-left: auto; }
+.section-title { font-size: 18px; font-weight: 600; margin-bottom: 14px; margin-top: 24px; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+.section-title .badge { font-size: 12px; font-weight: 400; color: #636e72; }
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 24px; }
+th { background: #1a1a2e; color: #fff; padding: 12px 14px; text-align: left; font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+td { padding: 12px 14px; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+tr:last-child td { border-bottom: none; }
+tr.total td { background: #eef0ff; font-weight: 600; border-top: 2px solid #1a1a2e; }
+.num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'SF Mono', 'Consolas', monospace; }
+.chart-wrap { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 24px; }
+.chart-wrap h2 { font-size: 15px; font-weight: 500; margin-bottom: 14px; color: #1a1a2e; }
+.charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 500; }
+.badge-BX { background: #eef0ff; color: #6c5ce7; }
+.badge-BT { background: #e6fff8; color: #00b894; }
+.badge-PM { background: #fff3e6; color: #e17055; }
+.badge-BF { background: #e6f7ff; color: #0984e3; }
+.badge-RM { background: #ffe6e6; color: #d63031; }
+.badge-SK { background: #f0e6ff; color: #a855f7; }
+.badge-MF { background: #e6ffe6; color: #16a34a; }
+.badge-PR { background: #f5f5f5; color: #636e72; }
+.badge-TH { background: #e6f0ff; color: #2563eb; }
+.badge-BO { background: #fef3e2; color: #d97706; }
+.badge-PH { background: #f0f0f0; color: #e17055; }
+.badge-S { background: #f0f0f0; color: #0984e3; }
+.badge-KK { background: #f0e6ff; color: #a855f7; }
+.badge-KM { background: #ffe6e6; color: #d63031; }
+.badge-default { background: #f0f0f0; color: #636e72; }
+.tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.tables-grid table { margin-bottom: 0; }
+.tile-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.tile-row .tile-label { font-size: 13px; color: #636e72; font-weight: 500; margin-right: 6px; min-width: 60px; }
+.tile { padding: 5px 14px; border-radius: 16px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid #dfe6e9; background: #fff; color: #2d3436; transition: all 0.12s; font-family: inherit; }
+.tile:hover { border-color: #6c5ce7; color: #6c5ce7; }
+.tile.active { background: #6c5ce7; color: #fff; border-color: #6c5ce7; }
+.tile.all { border-color: #dfe6e9; color: #636e72; }
+.tile.all.active { background: #dfe6e9; color: #2d3436; border-color: #dfe6e9; }
+.summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.summary-card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.summary-card .label { font-size: 12px; color: #636e72; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; }
+.summary-card .value { font-size: 22px; font-weight: 600; color: #1a1a2e; font-variant-numeric: tabular-nums; }
+.status-pill { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 12px; font-weight: 500; }
+.status-pill-11 { background: #d4edda; color: #155724; }
+.status-pill-6 { background: #f8d7da; color: #721c24; }
+.status-pill-3 { background: #fff3cd; color: #856404; }
+.status-pill-14 { background: #e2e3f5; color: #383d41; }
+.status-pill-8 { background: #d1ecf1; color: #0c5460; }
+.status-pill-1 { background: #f0f0f0; color: #636e72; }
+.status-pill-7 { background: #d4edda; color: #155724; }
+.status-pill-13 { background: #e2e3f5; color: #383d41; }
+.status-pill-12 { background: #fff3cd; color: #856404; }
+.status-pill-9 { background: #e2e3f5; color: #383d41; }
+.status-pill-4 { background: #d1ecf1; color: #0c5460; }
+.status-pill-5 { background: #f0f0f0; color: #636e72; }
+.status-pill-10 { background: #fff3cd; color: #856404; }
+.status-pill-default { background: #f0f0f0; color: #636e72; }
+@media (max-width: 768px) { body { padding: 16px; } .charts { grid-template-columns: 1fr; } .summary-cards { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Отчёт по тендерам</h1>
+<div class="filters">
+  <span class="info" id="infoText" style="margin-left:auto">Загрузка...</span>
+</div>
+<div class="tile-row" id="statusRow">
+  <span class="tile-label">Статус</span>
+</div>
+<div class="tile-row" id="yearRow">
+  <span class="tile-label">Год</span>
+</div>
+<div class="tile-row" id="monthRow">
+  <span class="tile-label">Месяц</span>
+</div>
+<div class="tile-row" id="execRow">
+  <span class="tile-label">Исполнитель ТЭО</span>
+</div>
+
+<div class="summary-cards" id="summaryCards"></div>
+
+<div id="statusTableWrap" class="tables-grid">
+  <div>
+    <div class="section-title">Сводка по статусам <span class="badge" id="statusSummaryCount"></span></div>
+    <table id="statusTable">
+      <thead>
+        <tr>
+          <th>Статус</th>
+          <th class="num">Площадь, м²</th>
+          <th class="num">Ср. стоимость, ₽</th>
+          <th class="num">Сумма, ₽</th>
+          <th class="num">Работ</th>
+        </tr>
+      </thead>
+      <tbody id="statusTableBody"></tbody>
+    </table>
+  </div>
+  <div>
+    <div class="section-title">Сводка по типам работ <span class="badge" id="allTypeSummaryCount"></span></div>
+    <table id="allTypeTable">
+      <thead>
+        <tr>
+          <th>Тип работ</th>
+          <th class="num">Площадь, м²</th>
+          <th class="num">Ср. стоимость, ₽</th>
+          <th class="num">Сумма, ₽</th>
+          <th class="num">Работ</th>
+        </tr>
+      </thead>
+      <tbody id="allTypeTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="typeTableWrap" style="display:none">
+  <div class="section-title">Разбивка по типам работ <span class="badge" id="typeSummaryCount"></span></div>
+  <table id="typeTable">
+    <thead>
+      <tr>
+        <th>Тип работ</th>
+        <th class="num">Площадь, м²</th>
+        <th class="num">Ср. стоимость, ₽</th>
+        <th class="num">Сумма, ₽</th>
+        <th class="num">Работ</th>
+      </tr>
+    </thead>
+    <tbody id="typeTableBody"></tbody>
+  </table>
+
+  <div class="charts">
+    <div class="chart-wrap">
+      <h2>Площадь по типам работ, м²</h2>
+      <canvas id="areaChart"></canvas>
+    </div>
+    <div class="chart-wrap">
+      <h2>Сумма по типам работ, ₽</h2>
+      <canvas id="sumChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="section-title">Детальная развёртка <span class="badge" id="detailCount"></span></div>
+<table id="detailTable">
+  <thead>
+    <tr>
+      <th>Объект</th>
+      <th>Статус</th>
+      <th>Тип работ</th>
+      <th class="num">Площадь, м²</th>
+      <th class="num">Сумма, ₽</th>
+      <th>Дата</th>
+    </tr>
+  </thead>
+  <tbody id="detailBody"></tbody>
+</table>
+</div>
+
+<script>
+const STATUS_NAMES = {
+  1: 'Создан', 3: 'В работе с КМД', 4: 'Выполнение строительства',
+  5: 'Статус 5', 6: 'Завершен', 7: 'Закрыт успешно',
+  8: 'На согласовании', 9: 'Предварительный расчет',
+  10: 'Претендуем на тендер', 11: 'Тендер выигран',
+  12: 'Участвуем в тендере', 13: 'Участвовали в тендере',
+  14: 'Выход на тендер'
+};
+
+const TIP_SHORT = {
+  'vkh_vitrazhi_kholodnye': 'BX',
+  'vt_vitrazhi_tyoplye': 'BT',
+  'pm_-_postavka_materialov': 'PM',
+  'vf_ventiliruemye_fasady': 'BF',
+  'rm_remontnye_raboty': 'RM',
+  'sk_steklyannye_kozyrki': 'SK',
+  'mf_mokrye_fasady_shtukaturnye': 'MF',
+  'pr_prochee': 'PR',
+  'tkh_vitrazhi_tyoplo-kholodnye': 'TH',
+  'vo_vitrazh_obrazec': 'BO',
+  'pkh_pvkh_konstrukcii': 'PH',
+  'sp_sendvich_paneli': 'SP',
+  's_stekloizdeliya': 'S',
+  'kk_kassety_kompozitnye': 'KK',
+  'km_kassety_metallicheskie': 'KM'
+};
+
+function getShort(code) { return TIP_SHORT[code] || code; }
+
+function fmtNum(n) {
+  if (n === 0 || n === null || n === undefined) return '0';
+  return n.toLocaleString('ru-RU', { maximumFractionDigits: 2, minimumFractionDigits: 0 });
+}
+
+function fmtMoney(n) {
+  if (n === 0 || n === null || n === undefined) return '0';
+  return n.toLocaleString('ru-RU', { maximumFractionDigits: 2, minimumFractionDigits: 0 });
+}
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('ru-RU');
+}
+
+let rawData = [];
+let areaChartInstance = null;
+let sumChartInstance = null;
+let selectedYear = null;
+let selectedMonth = null;
+let selectedStatuses = new Set();
+let selectedExecutors = new Set();
+const EXEC_NAMES = {
+  '0fa76694-0827-4478-8506-aa80734421c0': 'Михайлова',
+  '7836cce8-4f11-4562-8a7d-73f815d89219': 'Сироткина',
+  '8562b4ed-c244-4b02-8ed6-097769203714': 'Груздев',
+  'ccc2b372-887a-4e38-9b2b-62012fc50701': 'Толокнов',
+  'c3c004d0-cd2c-486d-b368-423c5a99d9f3': 'Авраменко',
+  'b3c03b73-234e-4f0b-81f7-a87a75a6b9ac': 'Кудряшов',
+  '5dcea3e8-b5cc-4329-ae96-926a7afd59d3': 'Иванов',
+  '3fcc594a-b772-4c8b-ac6a-950b7667274c': 'Майоров',
+  'db058d87-2b19-4ef3-be11-240a111d166f': 'Мохеллеби'
+};
+
+function applyFilter() {
+  const isAllStatuses = selectedStatuses.size === 0;
+  const isAllExecutors = selectedExecutors.size === 0;
+
+  let filtered = rawData;
+
+  if (!isAllStatuses) {
+    filtered = filtered.filter(d => selectedStatuses.has(d.status_id));
+  }
+  if (!isAllExecutors) {
+    filtered = filtered.filter(d => {
+      if (!d.executors || d.executors.length === 0) return false;
+      return d.executors.some(e => selectedExecutors.has(e));
+    });
+  }
+  if (selectedYear !== null) {
+    filtered = filtered.filter(d => {
+      const y = new Date(d.date).getFullYear();
+      return y === selectedYear;
+    });
+  }
+  if (selectedMonth !== null) {
+    filtered = filtered.filter(d => {
+      const m = new Date(d.date).getMonth();
+      return m === selectedMonth;
+    });
+  }
+
+  const totalCount = filtered.length;
+  const totalArea = filtered.reduce((s, d) => s + (d.kvadratura || 0), 0);
+  const totalSum = filtered.reduce((s, d) => s + (d.summa || 0), 0);
+  const avgCost = totalCount > 0 ? totalSum / totalCount : 0;
+
+  document.getElementById('summaryCards').innerHTML = `
+    <div class="summary-card"><div class="label">Всего работ</div><div class="value">${totalCount}</div></div>
+    <div class="summary-card"><div class="label">Общая площадь, м&sup2;</div><div class="value">${fmtNum(totalArea)}</div></div>
+    <div class="summary-card"><div class="label">Общая сумма, &#8381;</div><div class="value">${fmtMoney(totalSum)}</div></div>
+    <div class="summary-card"><div class="label">Средняя стоимость, &#8381;</div><div class="value">${fmtMoney(avgCost)}</div></div>
+  `;
+
+  const filterDesc = isAllStatuses ? 'Все статусы' : [...selectedStatuses].map(id => STATUS_NAMES[id] || 'Статус ' + id).join(', ');
+  const yearTxt = selectedYear !== null ? String(selectedYear) : 'все года';
+  const monthNames = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  const monthTxt = selectedMonth !== null ? monthNames[selectedMonth] : 'все месяцы';
+  const execTxt = isAllExecutors ? 'все исполнители' : [...selectedExecutors].map(e => EXEC_NAMES[e] || e.substring(0,8)).join(', ');
+  document.getElementById('infoText').textContent = `${filterDesc}, ${yearTxt} / ${monthTxt}, ${execTxt}, найдено ${totalCount} записей`;
+
+  if (isAllStatuses) {
+    document.getElementById('statusTableWrap').style.display = '';
+    document.getElementById('typeTableWrap').style.display = 'none';
+
+    // Group by status
+    const groups = {};
+    for (const d of filtered) {
+      const key = d.status_id;
+      if (!groups[key]) groups[key] = { status_id: key, name: STATUS_NAMES[key] || 'Статус ' + key, area: 0, sum: 0, count: 0 };
+      groups[key].area += d.kvadratura || 0;
+      groups[key].sum += d.summa || 0;
+      groups[key].count++;
+    }
+    const sorted = Object.values(groups).sort((a, b) => b.sum - a.sum);
+    document.getElementById('statusSummaryCount').textContent = sorted.length + ' статусов';
+
+    let html = '';
+    for (const g of sorted) {
+      const avg = g.count > 0 ? g.sum / g.count : 0;
+      html += `<tr>
+        <td><span class="status-pill status-pill-${g.status_id}">${g.name}</span></td>
+        <td class="num">${fmtNum(g.area)}</td>
+        <td class="num">${fmtMoney(avg)}</td>
+        <td class="num">${fmtMoney(g.sum)}</td>
+        <td class="num">${g.count}</td>
+      </tr>`;
+    }
+    const totalAvg = totalCount > 0 ? totalSum / totalCount : 0;
+    html += `<tr class="total">
+      <td>ИТОГО</td>
+      <td class="num">${fmtNum(totalArea)}</td>
+      <td class="num">${fmtMoney(totalAvg)}</td>
+      <td class="num">${fmtMoney(totalSum)}</td>
+      <td class="num">${totalCount}</td>
+    </tr>`;
+    document.getElementById('statusTableBody').innerHTML = html;
+
+    // Group by type (for all-statuses view)
+    const typeGroups = {};
+    for (const d of filtered) {
+      const key = d.tip_code;
+      if (!typeGroups[key]) typeGroups[key] = { tip_code: key, tip_name: d.tip_name, area: 0, sum: 0, count: 0 };
+      typeGroups[key].area += d.kvadratura || 0;
+      typeGroups[key].sum += d.summa || 0;
+      typeGroups[key].count++;
+    }
+    const typeSorted = Object.values(typeGroups).sort((a, b) => b.sum - a.sum);
+    document.getElementById('allTypeSummaryCount').textContent = typeSorted.length + ' типов';
+
+    let typeHtml = '';
+    for (const g of typeSorted) {
+      const avg = g.count > 0 ? g.sum / g.count : 0;
+      const sc = getShort(g.tip_code);
+      typeHtml += `<tr>
+        <td><span class="badge badge-${sc}">${sc}</span> ${g.tip_name}</td>
+        <td class="num">${fmtNum(g.area)}</td>
+        <td class="num">${fmtMoney(avg)}</td>
+        <td class="num">${fmtMoney(g.sum)}</td>
+        <td class="num">${g.count}</td>
+      </tr>`;
+    }
+    typeHtml += `<tr class="total">
+      <td>ИТОГО</td>
+      <td class="num">${fmtNum(totalArea)}</td>
+      <td class="num">${fmtMoney(totalAvg)}</td>
+      <td class="num">${fmtMoney(totalSum)}</td>
+      <td class="num">${totalCount}</td>
+    </tr>`;
+    document.getElementById('allTypeTableBody').innerHTML = typeHtml;
+
+    // Detail table
+    renderDetail(filtered);
+
+  } else {
+    document.getElementById('statusTableWrap').style.display = 'none';
+    document.getElementById('typeTableWrap').style.display = '';
+
+    // Group by tip_code
+    const groups = {};
+    for (const d of filtered) {
+      const key = d.tip_code;
+      if (!groups[key]) groups[key] = { tip_code: key, tip_name: d.tip_name, area: 0, sum: 0, count: 0 };
+      groups[key].area += d.kvadratura || 0;
+      groups[key].sum += d.summa || 0;
+      groups[key].count++;
+    }
+    const sorted = Object.values(groups).sort((a, b) => b.sum - a.sum);
+    document.getElementById('typeSummaryCount').textContent = sorted.length + ' типов';
+
+    let html = '';
+    for (const g of sorted) {
+      const avg = g.count > 0 ? g.sum / g.count : 0;
+      const sc = getShort(g.tip_code);
+      html += `<tr>
+        <td><span class="badge badge-${sc}">${sc}</span> ${g.tip_name}</td>
+        <td class="num">${fmtNum(g.area)}</td>
+        <td class="num">${fmtMoney(avg)}</td>
+        <td class="num">${fmtMoney(g.sum)}</td>
+        <td class="num">${g.count}</td>
+      </tr>`;
+    }
+    const totalAvg = totalCount > 0 ? totalSum / totalCount : 0;
+    html += `<tr class="total">
+      <td>ИТОГО</td>
+      <td class="num">${fmtNum(totalArea)}</td>
+      <td class="num">${fmtMoney(totalAvg)}</td>
+      <td class="num">${fmtMoney(totalSum)}</td>
+      <td class="num">${totalCount}</td>
+    </tr>`;
+    document.getElementById('typeTableBody').innerHTML = html;
+
+    // Charts
+    const labels = sorted.map(g => getShort(g.tip_code));
+    const areaData = sorted.map(g => Math.round(g.area * 100) / 100);
+    const sumData = sorted.map(g => Math.round(g.sum * 100) / 100);
+    const colors = ['#6c5ce7','#00b894','#e17055','#0984e3','#d63031','#a855f7','#16a34a','#636e72','#2563eb','#fdcb6e','#e17055','#00b894','#6c5ce7','#d63031','#a855f7'];
+
+    const chartOpts = {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('ru-RU') } },
+        x: { grid: { display: false } }
+      }
+    };
+
+    if (areaChartInstance) areaChartInstance.destroy();
+    areaChartInstance = new Chart(document.getElementById('areaChart'), {
+      type: 'bar',
+      data: { labels, datasets: [{ data: areaData, backgroundColor: colors.slice(0, labels.length), borderRadius: 4 }] },
+      options: chartOpts
+    });
+
+    if (sumChartInstance) sumChartInstance.destroy();
+    sumChartInstance = new Chart(document.getElementById('sumChart'), {
+      type: 'bar',
+      data: { labels, datasets: [{ data: sumData, backgroundColor: colors.slice(0, labels.length), borderRadius: 4 }] },
+      options: chartOpts
+    });
+
+    // Detail table
+    renderDetail(filtered);
+  }
+}
+
+function renderDetail(filtered) {
+  const detail = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  let html = '';
+  for (const item of detail) {
+    const sc = getShort(item.tip_code);
+    html += `<tr>
+      <td>${item.name}</td>
+      <td><span class="status-pill status-pill-${item.status_id}">${item.status_name}</span></td>
+      <td><span class="badge badge-${sc}">${sc}</span></td>
+      <td class="num">${fmtNum(item.kvadratura)}</td>
+      <td class="num">${fmtMoney(item.summa)}</td>
+      <td>${fmtDate(item.date)}</td>
+    </tr>`;
+  }
+  document.getElementById('detailBody').innerHTML = html;
+  document.getElementById('detailCount').textContent = detail.length + ' записей';
+}
+
+function initStatusFilter() {
+  const row = document.getElementById('statusRow');
+  const ids = [...new Set(rawData.map(d => d.status_id))].sort((a, b) => a - b);
+  const allBtn = document.createElement('button');
+  allBtn.className = 'tile all active';
+  allBtn.dataset.value = 'all';
+  allBtn.textContent = 'Все статусы';
+  allBtn.onclick = () => {
+    selectedStatuses.clear();
+    row.querySelectorAll('.tile:not(.all)').forEach(t => t.classList.remove('active'));
+    document.querySelector('#statusRow .tile.all').classList.add('active');
+    applyFilter();
+  };
+  row.appendChild(allBtn);
+  for (const id of ids) {
+    const btn = document.createElement('button');
+    btn.className = 'tile';
+    btn.dataset.value = id;
+    btn.textContent = STATUS_NAMES[id] || 'Статус ' + id;
+    btn.onclick = () => {
+      btn.classList.toggle('active');
+      if (selectedStatuses.has(id)) { selectedStatuses.delete(id); }
+      else { selectedStatuses.add(id); }
+      document.querySelector('#statusRow .tile.all').classList.remove('active');
+      if (selectedStatuses.size === 0) {
+        document.querySelector('#statusRow .tile.all').classList.add('active');
+      }
+      applyFilter();
+    };
+    row.appendChild(btn);
+  }
+}
+
+function selectTile(group, value) {
+  const container = document.getElementById(group);
+  container.querySelectorAll('.tile').forEach(t => t.classList.remove('active'));
+  const tile = container.querySelector(`[data-value="${value}"]`);
+  if (tile) tile.classList.add('active');
+}
+
+function resetTiles(group) {
+  document.getElementById(group).querySelectorAll('.tile').forEach(t => t.classList.remove('active'));
+  const all = document.querySelector(`#${group} .tile.all`);
+  if (all) all.classList.add('active');
+}
+
+function initYearMonthTiles() {
+  const years = [...new Set(rawData.map(d => new Date(d.date).getFullYear()))].sort((a, b) => a - b);
+  const yearRow = document.getElementById('yearRow');
+  const allY = document.createElement('button');
+  allY.className = 'tile all active';
+  allY.dataset.value = '';
+  allY.textContent = 'Все';
+  allY.onclick = () => { selectedYear = null; selectTile('yearRow', ''); applyFilter(); };
+  yearRow.appendChild(allY);
+  for (const y of years) {
+    const btn = document.createElement('button');
+    btn.className = 'tile';
+    btn.dataset.value = y;
+    btn.textContent = y;
+    btn.onclick = () => { selectedYear = y; selectTile('yearRow', y); applyFilter(); };
+    yearRow.appendChild(btn);
+  }
+
+  const monthNames = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+  const monthRow = document.getElementById('monthRow');
+  const allM = document.createElement('button');
+  allM.className = 'tile all active';
+  allM.dataset.value = '';
+  allM.textContent = 'Все';
+  allM.onclick = () => { selectedMonth = null; selectTile('monthRow', ''); applyFilter(); };
+  monthRow.appendChild(allM);
+  for (let i = 0; i < 12; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'tile';
+    btn.dataset.value = i;
+    btn.textContent = monthNames[i];
+    btn.onclick = () => { selectedMonth = i; selectTile('monthRow', i); applyFilter(); };
+    monthRow.appendChild(btn);
+  }
+}
+
+function initExecFilter() {
+  const row = document.getElementById('execRow');
+  const execSet = new Set();
+  for (const d of rawData) {
+    if (d.executors && Array.isArray(d.executors)) {
+      for (const e of d.executors) { if (e) execSet.add(e); }
+    }
+  }
+  const execs = [...execSet].sort();
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'tile all active';
+  allBtn.dataset.value = '';
+  allBtn.textContent = 'Все';
+  allBtn.onclick = () => {
+    selectedExecutors.clear();
+    row.querySelectorAll('.tile:not(.all)').forEach(t => t.classList.remove('active'));
+    document.querySelector('#execRow .tile.all').classList.add('active');
+    applyFilter();
+  };
+  row.appendChild(allBtn);
+
+  for (const eid of execs) {
+    const btn = document.createElement('button');
+    btn.className = 'tile';
+    btn.dataset.value = eid;
+    btn.textContent = EXEC_NAMES[eid] || eid.substring(0, 8);
+    btn.onclick = () => {
+      btn.classList.toggle('active');
+      if (selectedExecutors.has(eid)) { selectedExecutors.delete(eid); }
+      else { selectedExecutors.add(eid); }
+      document.querySelector('#execRow .tile.all').classList.remove('active');
+      if (selectedExecutors.size === 0) {
+        document.querySelector('#execRow .tile.all').classList.add('active');
+      }
+      applyFilter();
+    };
+    row.appendChild(btn);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  rawData = tenderData;
+  initStatusFilter();
+  initYearMonthTiles();
+  initExecFilter();
+  applyFilter();
+});
+</script>
+</body>
+</html>

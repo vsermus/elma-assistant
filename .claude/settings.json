@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem *)",
+      "Bash(python scripts/load/load_data.py *)",
+      "Bash(.\\scripts\\run.ps1 *)",
+      "Bash(powershell -File scripts/run.ps1 *)",
+      "Bash(./scripts/run.ps1 *)"
+    ]
+  }
+}

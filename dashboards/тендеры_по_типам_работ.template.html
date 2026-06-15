@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тендеры по типам работ</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1a1a2e; padding: 20px; }
+h1 { font-size: 24px; margin-bottom: 4px; }
+.subtitle { color: #666; font-size: 14px; margin-bottom: 20px; }
+
+.filter-bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.filter-group { display: flex; align-items: center; gap: 6px; }
+.filter-group label { font-size: 13px; font-weight: 600; color: #555; }
+.filter-group select { padding: 6px 12px; border: 1px solid #d0d5dd; border-radius: 6px; font-size: 13px; background: #fff; cursor: pointer; }
+.filter-group select:focus { outline: none; border-color: #4f6ef7; box-shadow: 0 0 0 2px rgba(79,110,247,0.15); }
+.btn-reset { padding: 6px 14px; border: 1px solid #d0d5dd; border-radius: 6px; font-size: 13px; background: #fff; cursor: pointer; color: #666; transition: all 0.15s; }
+.btn-reset:hover { border-color: #e74c3c; color: #e74c3c; background: #fff5f5; }
+
+.summary-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.summary-card { flex: 1; min-width: 160px; background: #fff; border: 1px solid #e2e5ea; border-radius: 10px; padding: 14px 18px; }
+.summary-card .label { font-size: 12px; color: #888; margin-bottom: 4px; }
+.summary-card .value { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+.summary-card .value.rub { font-size: 18px; }
+.summary-card .sub { font-size: 11px; color: #999; margin-top: 2px; }
+.summary-card.highlight { border-color: #4f6ef7; background: #f8f9ff; }
+
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+th { background: #f8f9fc; font-size: 12px; font-weight: 700; color: #555; text-align: right; padding: 12px 14px; border-bottom: 2px solid #e2e5ea; white-space: nowrap; cursor: pointer; user-select: none; }
+th:first-child { text-align: left; }
+th:hover { color: #4f6ef7; }
+td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #f0f2f5; text-align: right; }
+td:first-child { text-align: left; font-weight: 600; color: #1a1a2e; }
+tr:hover td { background: #f8f9ff; }
+tr:last-child td { border-bottom: none; }
+.num { font-variant-numeric: tabular-nums; }
+.money { font-variant-numeric: tabular-nums; }
+.type-tag { display: inline-block; background: #eef0ff; color: #4f6ef7; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-right: 6px; }
+.no-data { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+.info-note { background: #fffbe6; border: 1px solid #ffe58f; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #8c6e00; margin-bottom: 16px; }
+
+.chart-container { margin-top: 20px; background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.chart-container h3 { font-size: 14px; color: #555; margin-bottom: 12px; }
+.chart-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.chart-col { flex: 1; min-width: 280px; }
+.chart-col h4 { font-size: 12px; color: #888; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.chart-bar-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.chart-bar-label { min-width: 140px; font-size: 12px; text-align: right; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chart-bar-bg { flex: 1; height: 22px; background: #f0f2f5; border-radius: 4px; overflow: hidden; }
+.chart-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; display: flex; align-items: center; padding-left: 6px; font-size: 11px; color: #fff; font-weight: 600; white-space: nowrap; }
+.chart-bar-val { font-size: 11px; color: #888; min-width: 70px; text-align: left; }
+
+.tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+.tab-btn { padding: 6px 14px; border: 1px solid #d0d5dd; border-radius: 6px; font-size: 12px; background: #fff; cursor: pointer; color: #555; font-weight: 500; }
+.tab-btn:hover { border-color: #4f6ef7; color: #4f6ef7; }
+.tab-btn.active { background: #4f6ef7; color: #fff; border-color: #4f6ef7; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+@media (max-width: 768px) {
+  body { padding: 12px; }
+  .summary-card { min-width: 120px; }
+  .summary-card .value { font-size: 18px; }
+  .summary-card .value.rub { font-size: 15px; }
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .chart-col { min-width: 100%; }
+  .chart-bar-label { min-width: 100px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<h1>Тендеры по типам работ</h1>
+<p class="subtitle">Фильтр по году, месяцу и инициатору</p>
+
+<div class="filter-bar">
+  <div class="filter-group">
+    <label for="yearFilter">Год:</label>
+    <select id="yearFilter"></select>
+  </div>
+  <div class="filter-group">
+    <label for="monthFilter">Месяц:</label>
+    <select id="monthFilter"></select>
+  </div>
+  <div class="filter-group">
+    <label for="initFilter">Инициатор:</label>
+    <select id="initFilter">
+      <option value="">Все инициаторы</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label for="statusFilter">Статус:</label>
+    <select id="statusFilter">
+      <option value="">Все статусы</option>
+    </select>
+  </div>
+  <button class="btn-reset" id="resetBtn">Сбросить фильтры</button>
+</div>
+
+<div id="infoNote" class="info-note" style="display:none;"></div>
+
+<div class="summary-row" id="summaryRow"></div>
+
+<table id="dataTable">
+  <thead>
+    <tr>
+      <th data-sort="type">Тип работ</th>
+      <th data-sort="count">Кол-во</th>
+      <th data-sort="kv">м&sup2;</th>
+      <th data-sort="rr">Руб расчётов</th>
+      <th data-sort="kr">Руб контрактов</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+
+<div class="chart-container">
+  <h3>Распределение по типам работ</h3>
+  <div id="chartBars"></div>
+</div>
+
+<div class="chart-container" id="initiatorCharts">
+  <h3>По инициаторам</h3>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="init-count">Кол-во</button>
+    <button class="tab-btn" data-tab="init-kv">м²</button>
+    <button class="tab-btn" data-tab="init-rub">Рубли</button>
+  </div>
+  <div id="initChartCount" class="tab-content active"></div>
+  <div id="initChartKv" class="tab-content"></div>
+  <div id="initChartRub" class="tab-content"></div>
+</div>
+
+<div class="chart-container" id="statusCharts">
+  <h3>По статусам</h3>
+  <div id="statusChartBars"></div>
+</div>
+
+<script>
+const DATA = %DATA%;;
+
+const monthNames = ['', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+const monthShort = ['', 'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
+
+let selectedYear = '';
+let selectedMonth = '';
+let selectedInit = '';
+let selectedStatus = '';
+let sortKey = 'count';
+let sortAsc = false;
+
+function init() {
+  // Build year set
+  const years = [...new Set(DATA.rows.map(function(r) { return r.y; }))].sort();
+  const yearSel = document.getElementById('yearFilter');
+  yearSel.innerHTML = '<option value="">Все годы</option>';
+  years.forEach(function(y) {
+    var opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    yearSel.appendChild(opt);
+  });
+
+  // Build month set
+  const months = [...new Set(DATA.rows.map(function(r) { return r.m; }))].sort(function(a,b) { return a-b; });
+  const monthSel = document.getElementById('monthFilter');
+  monthSel.innerHTML = '<option value="">Все месяцы</option>';
+  months.forEach(function(m) {
+    var opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = monthNames[m];
+    monthSel.appendChild(opt);
+  });
+
+  // Build initiators
+  var initSel = document.getElementById('initFilter');
+  DATA.inits.forEach(function(n) {
+    var opt = document.createElement('option');
+    opt.value = n;
+    opt.textContent = n;
+    initSel.appendChild(opt);
+  });
+
+  // Build statuses
+  var statusSel = document.getElementById('statusFilter');
+  DATA.statuses.forEach(function(s) {
+    var opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s;
+    statusSel.appendChild(opt);
+  });
+
+  // Default: last year-month with data
+  var sortedYM = [...new Set(DATA.rows.map(function(r) { return r.y * 100 + r.m; }))].sort();
+  var lastYM = sortedYM[sortedYM.length - 1];
+  var lastYear = Math.floor(lastYM / 100);
+  var lastMonth = lastYM % 100;
+  yearSel.value = lastYear;
+  selectedYear = String(lastYear);
+  updateMonthOptions();
+  monthSel.value = lastMonth;
+  selectedMonth = String(lastMonth);
+
+  // Events
+  yearSel.addEventListener('change', function() {
+    selectedYear = this.value;
+    updateMonthOptions();
+    renderData();
+  });
+  monthSel.addEventListener('change', function() { selectedMonth = this.value; renderData(); });
+  initSel.addEventListener('change', function() { selectedInit = this.value; renderData(); });
+  statusSel.addEventListener('change', function() { selectedStatus = this.value; renderData(); });
+  document.getElementById('resetBtn').addEventListener('click', resetFilters);
+
+  // Sort on table header click
+  document.querySelectorAll('th[data-sort]').forEach(function(th) {
+    th.addEventListener('click', function() {
+      var key = this.getAttribute('data-sort');
+      if (sortKey === key) { sortAsc = !sortAsc; } else { sortKey = key; sortAsc = false; }
+      renderTable();
+    });
+  });
+
+  renderData();
+}
+
+function updateMonthOptions() {
+  var year = parseInt(selectedYear);
+  var monthsInYear = {};
+  DATA.rows.forEach(function(r) {
+    if (!selectedYear || r.y === year) monthsInYear[r.m] = true;
+  });
+  var monthSel = document.getElementById('monthFilter');
+  var currentVal = monthSel.value;
+  monthSel.innerHTML = '<option value="">Все месяцы</option>';
+  Object.keys(monthsInYear).map(Number).sort(function(a,b) { return a-b; }).forEach(function(m) {
+    var opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = monthNames[m];
+    monthSel.appendChild(opt);
+  });
+  if (currentVal && monthsInYear[parseInt(currentVal)]) {
+    monthSel.value = currentVal;
+  } else {
+    monthSel.value = '';
+    selectedMonth = '';
+  }
+}
+
+function resetFilters() {
+  selectedYear = '';
+  selectedMonth = '';
+  selectedInit = '';
+  selectedStatus = '';
+  document.getElementById('yearFilter').value = '';
+  document.getElementById('monthFilter').value = '';
+  document.getElementById('initFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  renderData();
+}
+
+function renderData() {
+  var filtered = DATA.rows.filter(function(r) {
+    if (selectedYear && r.y !== parseInt(selectedYear)) return false;
+    if (selectedMonth && r.m !== parseInt(selectedMonth)) return false;
+    if (selectedInit && r.ii !== selectedInit) return false;
+    if (selectedStatus && r.si !== selectedStatus) return false;
+    return true;
+  });
+
+  var byType = {};
+  filtered.forEach(function(r) {
+    if (!byType[r.tc]) byType[r.tc] = { tc: r.tc, tn: r.tn, ts: r.ts, count: 0, kv: 0, rr: 0, kr: 0 };
+    byType[r.tc].count++;
+    byType[r.tc].kv += r.kv;
+    byType[r.tc].rr += r.rr;
+    byType[r.tc].kr += r.kr;
+  });
+
+  var typeRows = Object.values(byType);
+
+  // Summary
+  var totalTenders = new Set(filtered.map(function(r) { return r.tc; })).size;
+  var totalCount = filtered.length;
+  var totalKv = typeRows.reduce(function(s, r) { return s + r.kv; }, 0);
+  var totalRr = typeRows.reduce(function(s, r) { return s + r.rr; }, 0);
+  var totalKr = typeRows.reduce(function(s, r) { return s + r.kr; }, 0);
+
+  document.getElementById('summaryRow').innerHTML =
+    '<div class="summary-card highlight"><div class="label">Записей</div><div class="value">' + totalCount + '</div><div class="sub">' + totalTenders + ' типов работ</div></div>' +
+    '<div class="summary-card"><div class="label">Площадь (м&sup2;)</div><div class="value">' + fmtNum(totalKv) + '</div><div class="sub">' + (totalKv > 0 ? (totalKv/1000).toFixed(1) + ' тыс м&sup2;' : '') + '</div></div>' +
+    '<div class="summary-card"><div class="label">Сумма расчётов</div><div class="value rub">' + formatRub(totalRr) + '</div></div>' +
+    '<div class="summary-card"><div class="label">Сумма контрактов</div><div class="value rub">' + formatRub(totalKr) + '</div></div>';
+
+  // Info note about m2
+  var note = document.getElementById('infoNote');
+  if (totalCount > 0 && totalKv === 0) {
+    note.style.display = 'block';
+    note.innerHTML = 'Для выбранного периода данные по площади (м&sup2;) отсутствуют. Площадь заполнена в ELMA только для 136 тендеров из 783 &mdash; в остальных случаях поле kvadratura не заполнено.';
+  } else {
+    note.style.display = 'none';
+  }
+
+  renderTable(typeRows);
+  renderChart(typeRows);
+
+  // Aggregate by initiator
+  var byInit = {};
+  filtered.forEach(function(r) {
+    if (!byInit[r.ii]) byInit[r.ii] = { name: r.ii, count: 0, kv: 0, rr: 0, kr: 0 };
+    byInit[r.ii].count++;
+    byInit[r.ii].kv += r.kv;
+    byInit[r.ii].rr += r.rr;
+    byInit[r.ii].kr += r.kr;
+  });
+  var initRows = Object.values(byInit).sort(function(a, b) { return b.count - a.count; });
+  renderInitCharts(initRows);
+
+  // Aggregate by status
+  var byStatus = {};
+  filtered.forEach(function(r) {
+    if (!byStatus[r.si]) byStatus[r.si] = { name: r.si, count: 0, kv: 0, rr: 0 };
+    byStatus[r.si].count++;
+    byStatus[r.si].kv += r.kv;
+    byStatus[r.si].rr += r.rr;
+  });
+  var statusRows = Object.values(byStatus);
+  var statusOrder = DATA.statuses;
+  statusRows.sort(function(a, b) {
+    var ia = statusOrder.indexOf(a.name);
+    var ib = statusOrder.indexOf(b.name);
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  });
+  renderStatusChart(statusRows);
+}
+
+function renderTable(typeRows) {
+  if (!typeRows) {
+    // Recompute from current data
+    var filtered = DATA.rows.filter(function(r) {
+      if (selectedYear && r.y !== parseInt(selectedYear)) return false;
+      if (selectedMonth && r.m !== parseInt(selectedMonth)) return false;
+      if (selectedInit && r.ii !== selectedInit) return false;
+      return true;
+    });
+    var byType = {};
+    filtered.forEach(function(r) {
+      if (!byType[r.tc]) byType[r.tc] = { tc: r.tc, tn: r.tn, ts: r.ts, count: 0, kv: 0, rr: 0, kr: 0 };
+      byType[r.tc].count++;
+      byType[r.tc].kv += r.kv;
+      byType[r.tc].rr += r.rr;
+      byType[r.tc].kr += r.kr;
+    });
+    typeRows = Object.values(byType);
+  }
+
+  typeRows.sort(function(a, b) {
+    var mul = sortAsc ? 1 : -1;
+    if (sortKey === 'type') return mul * a.tc.localeCompare(b.tc);
+    if (sortKey === 'kv') return mul * (a.kv - b.kv);
+    if (sortKey === 'rr') return mul * (a.rr - b.rr);
+    if (sortKey === 'kr') return mul * (a.kr - b.kr);
+    return mul * (a.count - b.count);
+  });
+
+  var tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  if (typeRows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="no-data">Нет данных за выбранный период</td></tr>';
+  } else {
+    typeRows.forEach(function(r) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><span class="type-tag">' + r.ts + '</span>' + (r.tn.split(' — ')[1] || r.tn) + '</td>' +
+        '<td class="num">' + r.count + '</td>' +
+        '<td class="num">' + fmtNum(r.kv) + '</td>' +
+        '<td class="money">' + formatRub(r.rr) + '</td>' +
+        '<td class="money">' + formatRub(r.kr) + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+}
+
+function renderChart(typeRows) {
+  var chartDiv = document.getElementById('chartBars');
+  chartDiv.innerHTML = '';
+  if (typeRows.length === 0) {
+    chartDiv.innerHTML = '<div class="no-data">Нет данных</div>';
+    return;
+  }
+  var sorted = typeRows.slice().sort(function(a, b) { return b.count - a.count; });
+  var maxCount = sorted[0].count;
+  var colors = ['#4f6ef7','#6c5ce7','#a29bfe','#00b894','#00cec9','#fd79a8','#e17055','#fdcb6e','#0984e3','#e84393','#636e72','#b2bec3'];
+  sorted.slice(0, 12).forEach(function(r, i) {
+    var pct = (r.count / maxCount) * 100;
+    var wrap = document.createElement('div');
+    wrap.className = 'chart-bar-wrap';
+    wrap.innerHTML =
+      '<div class="chart-bar-label">' + r.ts + '</div>' +
+      '<div class="chart-bar-bg"><div class="chart-bar-fill" style="width:' + Math.max(pct, 8) + '%;background:' + colors[i % colors.length] + '">' + r.count + '</div></div>';
+    chartDiv.appendChild(wrap);
+  });
+}
+
+function renderInitCharts(initRows) {
+  var maxCount = initRows.length > 0 ? initRows[0].count : 1;
+  var maxKv = initRows.length > 0 ? initRows.reduce(function(s, r) { return Math.max(s, r.kv); }, 0) : 1;
+  var maxRr = initRows.length > 0 ? initRows.reduce(function(s, r) { return Math.max(s, r.rr); }, 0) : 1;
+  var colors = ['#4f6ef7','#6c5ce7','#a29bfe','#00b894','#00cec9','#fd79a8','#e17055','#fdcb6e','#0984e3','#e84393','#636e72','#b2bec3','#d63031','#00b894'];
+
+  function buildChart(containerId, sorted, maxVal, valKey, fmtFn, barColor) {
+    var div = document.getElementById(containerId);
+    div.innerHTML = '';
+    if (sorted.length === 0) { div.innerHTML = '<div class="no-data">Нет данных</div>'; return; }
+    sorted.forEach(function(r, i) {
+      var pct = (r[valKey] / maxVal) * 100;
+      var wrap = document.createElement('div');
+      wrap.className = 'chart-bar-wrap';
+      wrap.innerHTML =
+        '<div class="chart-bar-label" title="' + r.name + '">' + r.name + '</div>' +
+        '<div class="chart-bar-bg"><div class="chart-bar-fill" style="width:' + Math.max(pct, 6) + '%;background:' + barColor + '">' + fmtFn(r[valKey]) + '</div></div>';
+      div.appendChild(wrap);
+    });
+  }
+
+  var sortedByCount = initRows.slice().sort(function(a, b) { return b.count - a.count; });
+  var sortedByKv = initRows.slice().sort(function(a, b) { return b.kv - a.kv; });
+  var sortedByRr = initRows.slice().sort(function(a, b) { return b.rr - a.rr; });
+
+  buildChart('initChartCount', sortedByCount, maxCount, 'count', function(v) { return v; }, '#4f6ef7');
+  buildChart('initChartKv', sortedByKv, maxKv, 'kv', fmtNum, '#00b894');
+  buildChart('initChartRub', sortedByRr, maxRr, 'rr', formatRub, '#e17055');
+
+  // Tab switching
+  var tabContainer = document.querySelector('#initiatorCharts .tabs');
+  if (tabContainer) {
+    tabContainer.onclick = function(e) {
+      var btn = e.target.closest('.tab-btn');
+      if (!btn) return;
+      document.querySelectorAll('#initiatorCharts .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      document.querySelectorAll('#initiatorCharts .tab-content').forEach(function(c) { c.classList.remove('active'); });
+      btn.classList.add('active');
+      var map = { 'init-count': 'initChartCount', 'init-kv': 'initChartKv', 'init-rub': 'initChartRub' };
+      var target = document.getElementById(map[btn.getAttribute('data-tab')]);
+      if (target) target.classList.add('active');
+    };
+  }
+}
+
+function renderStatusChart(rows) {
+  var div = document.getElementById('statusChartBars');
+  div.innerHTML = '';
+  if (rows.length === 0) { div.innerHTML = '<div class="no-data">Нет данных</div>'; return; }
+  var maxCount = rows.reduce(function(s, r) { return Math.max(s, r.count); }, 1);
+  var statusColors = {'Новый':'#3498db','В работе в ТЭО':'#f39c12','Расчет выполнен':'#9b59b6','Выход на тендер':'#1abc9c','Тендер выигран':'#2ecc71','Проигрыш тендера':'#e74c3c','Отказ от тендера':'#95a5a6','Подвести итоги тендера':'#e67e22'};
+  rows.forEach(function(r) {
+    var pct = (r.count / maxCount) * 100;
+    var wrap = document.createElement('div');
+    wrap.className = 'chart-bar-wrap';
+    wrap.innerHTML =
+      '<div class="chart-bar-label">' + r.name + '</div>' +
+      '<div class="chart-bar-bg"><div class="chart-bar-fill" style="width:' + Math.max(pct, 8) + '%;background:' + (statusColors[r.name] || '#4f6ef7') + '">' + r.count + '</div></div>' +
+      '<div class="chart-bar-val">' + fmtNum(r.kv) + ' м²</div>';
+    div.appendChild(wrap);
+  });
+}
+
+function fmtNum(n) {
+  if (n === 0 || n === null || n === undefined) return '—';
+  return n.toLocaleString('ru-RU', { maximumFractionDigits: 2 });
+}
+
+function formatRub(n) {
+  if (n === 0 || n === null || n === undefined) return '—';
+  if (Math.abs(n) >= 1000000) return (n / 1000000).toFixed(2) + ' млн';
+  if (Math.abs(n) >= 1000) return (n / 1000).toFixed(1) + ' тыс';
+  return n.toLocaleString('ru-RU', { maximumFractionDigits: 2 });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

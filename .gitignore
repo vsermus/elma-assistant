@@ -1,0 +1,50 @@
+# Токен и секреты
+.env
+
+# Данные ELMA (внутренние данные компании)
+data/
+
+# Логи
+*.log
+bot_error.log
+bot_live.log
+bot_stderr.log
+bot_stdout.log
+bot_err.txt
+bot_out.txt
+
+# Временные файлы
+temp/
+todo/
+__pycache__/
+*.pyc
+*.pyo
+
+# История сессий и отчёты (внутренние)
+history/
+reports/
+
+# Личные файлы
+Скрины к домашке/
+Скрины к Readme.md/
+ELMA_Bot_Bundle.rar
+
+# Системное
+.DS_Store
+Thumbs.db
+
+# Инструменты разработки
+.opencode/
+.obsidian/
+
+# Кэш и БД бота
+bot/data_cache/
+bot/chat_history.db
+bot/history.db
+
+# БД пользователей
+web_grafikk/backend/users.db
+
+# Персональные данные (152-ФЗ)
+subprojects/dashboard-builder/_sample.txt
+Podgotovka_bi/teo_gantt_data.json

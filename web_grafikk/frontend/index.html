@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>График витражей — ELMA</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#eef1f5;--card:#fff;--primary:#1a73e8;--primary-dark:#1557b0;--text:#1c1e21;--muted:#5f6368;--border:#dadce0;--green:#188038;--red:#d93025;--radius:8px;--shadow:0 1px 3px rgba(0,0,0,.12)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-screen{background:var(--card);padding:32px;border-radius:12px;box-shadow:var(--shadow);width:360px;max-width:90vw}
+.login-screen h1{font-size:20px;margin-bottom:8px;color:var(--primary)}
+.login-screen p{font-size:13px;color:var(--muted);margin-bottom:20px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.field input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px;outline:0;transition:border-color .15s}
+.field input:focus{border-color:var(--primary)}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:500;border:none;cursor:pointer;transition:background .15s,opacity .15s}
+.btn:active{opacity:.8}
+.btn-primary{background:var(--primary);color:#fff;width:100%}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-primary:disabled{background:#a8c7fa;cursor:not-allowed}
+.btn-danger{background:var(--red);color:#fff}
+.btn-outline{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{background:#f5f5f5}
+.btn-sm{padding:6px 14px;font-size:12px}
+.error{color:var(--red);font-size:13px;margin-top:8px;display:none}
+.app-screen{display:none;width:100%;max-width:960px;margin:0 auto;padding:16px}
+.header{background:var(--card);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.header h1{font-size:18px}
+.header .user-info{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:12px}
+.header .user-info .badge{background:var(--primary);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px}
+.content{display:flex;gap:16px;flex-wrap:wrap}
+.sidebar{flex:0 0 340px;min-width:280px}
+.main{flex:1;min-width:300px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:12px}
+.card h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text)}
+.search-box{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px;outline:0;transition:border-color .15s}
+.search-box:focus{border-color:var(--primary)}
+.object-list{max-height:320px;overflow-y:auto;margin-top:8px}
+.object-item{padding:8px 10px;border-radius:6px;cursor:pointer;transition:background .1s;border-bottom:1px solid #f0f0f0}
+.object-item:hover{background:#f0f6ff}
+.object-item.active{background:var(--primary);color:#fff}
+.object-item .obj-name{font-size:13px;font-weight:500}
+.object-item .obj-id{font-size:11px;color:var(--muted)}
+.object-item.active .obj-id{color:rgba(255,255,255,.7)}
+.empty-state{padding:24px 16px;text-align:center;color:var(--muted);font-size:13px}
+.korpus-list{max-height:240px;overflow-y:auto}
+.korpus-item{display:flex;align-items:center;gap:8px;padding:6px 4px;font-size:13px}
+.korpus-item input[type=checkbox]{accent-color:var(--primary);width:16px;height:16px}
+.loading{text-align:center;padding:40px;color:var(--muted)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:12px 24px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100}
+.toast.show{opacity:1}
+@media(max-width:720px){.sidebar.flex,.main,.content{flex:100%;min-width:0}}
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <h1>График витражей</h1>
+  <p>Войдите для доступа к формированию графиков</p>
+  <div class="field"><label>Логин</label><input type="text" id="loginUser" autocomplete="username" autofocus></div>
+  <div class="field"><label>Пароль</label><input type="password" id="loginPass" autocomplete="current-password"></div>
+  <button class="btn btn-primary" id="loginBtn">Войти</button>
+  <div class="error" id="loginError"></div>
+</div>
+
+<div class="app-screen" id="appScreen">
+  <div class="header">
+    <h1>📋 График витражей</h1>
+    <div class="user-info">
+      <span id="userName"></span><span class="badge" id="adminBadge" style="display:none">admin</span>
+      <button class="btn btn-outline btn-sm" id="logoutBtn">Выйти</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="sidebar">
+      <div class="card">
+        <h3>🔍 Поиск объекта</h3>
+        <input type="text" class="search-box" id="searchInput" placeholder="ID или название объекта...">
+        <div class="object-list" id="objectList"><div class="empty-state">Начните ввод для поиска</div></div>
+      </div>
+
+      <div class="card" id="korpusCard" style="display:none">
+        <h3>🏗️ Корпусы</h3>
+        <div style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" id="selectAllKorpus">Выбрать все</button>
+          <button class="btn btn-outline btn-sm" id="deselectAllKorpus">Сбросить</button>
+        </div>
+        <div class="korpus-list" id="korpusList"></div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="card">
+        <h3>📊 Параметры графика</h3>
+        <div class="field" style="margin-bottom:10px">
+          <label>Выбранный объект</label>
+          <div id="selectedObject" style="font-size:13px;color:var(--muted)">—</div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label>Секция (необязательно)</label>
+          <input type="text" class="search-box" id="sectionInput" placeholder="Оставить пустым — все секции" style="font-size:13px;padding:8px 10px">
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <div class="field" style="flex:1;min-width:120px;margin-bottom:0">
+            <label>Начало периода</label>
+            <input type="date" id="startDate" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px">
+          </div>
+          <div class="field" style="flex:1;min-width:120px;margin-bottom:0">
+            <label>Конец периода</label>
+            <input type="date" id="endDate" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px">
+          </div>
+        </div>
+        <button class="btn btn-primary" id="generateBtn" disabled>📥 Сформировать Excel</button>
+      </div>
+
+      <div class="card" id="adminCard" style="display:none">
+        <h3>⚙️ Администрирование</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <button class="btn btn-outline btn-sm" id="updateBtn">🔄 Обновить данные из ELMA</button>
+        </div>
+        <div id="adminUserSection" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+          <h4 style="font-size:13px;margin-bottom:8px">Пользователи</h4>
+          <div id="userList" style="font-size:12px;margin-bottom:8px"></div>
+          <div style="display:flex;gap:6px">
+            <input type="text" id="newUser" placeholder="Логин" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px">
+            <input type="password" id="newPass" placeholder="Пароль" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px">
+            <button class="btn btn-primary btn-sm" id="addUserBtn">➕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TOKEN_KEY = 'grafikk_token';
+const API = window.location.origin;
+
+function getToken(){return localStorage.getItem(TOKEN_KEY)}
+function setToken(t){localStorage.setItem(TOKEN_KEY,t)}
+function clearToken(){localStorage.removeItem(TOKEN_KEY)}
+
+async function api(path, opts={}){
+  const token = getToken();
+  const headers = {'Content-Type':'application/json'};
+  if (token) headers['Authorization'] = 'Bearer '+token;
+  if (opts.formData) delete headers['Content-Type'];
+  const res = await fetch(API + path, { ...opts, headers });
+  if (res.status===401){ clearToken(); showLogin(); throw new Error('Unauthorized'); }
+  if (!res.ok){
+    const body = await res.json().catch(()=>({}));
+    throw new Error(body.detail || `Ошибка ${res.status}`);
+  }
+  const ct = res.headers.get('content-type')||'';
+  if (ct.includes('application/json')) return res.json();
+  return res;
+}
+
+// Toast
+let toastTimer;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove('show'), 3000);
+}
+
+// Login
+function showLogin(){
+  document.getElementById('loginScreen').style.display='block';
+  document.getElementById('appScreen').style.display='none';
+}
+function showApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appScreen').style.display='block';
+}
+
+async function doLogin(){
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  if (!username || !password){ errEl.textContent='Введите логин и пароль'; errEl.style.display='block'; return; }
+  try {
+    const res = await api('/api/auth/login', { method:'POST', body:JSON.stringify({username,password}) });
+    setToken(res.access_token);
+    errEl.style.display='none';
+    await initApp();
+  } catch(e){
+    errEl.textContent=e.message; errEl.style.display='block';
+  }
+}
+document.getElementById('loginBtn').addEventListener('click', doLogin);
+document.getElementById('loginPass').addEventListener('keydown', e=>{if(e.key==='Enter')doLogin()});
+document.getElementById('loginUser').addEventListener('keydown', e=>{if(e.key==='Enter')document.getElementById('loginPass').focus()});
+document.getElementById('logoutBtn').addEventListener('click', ()=>{clearToken(); showLogin()});
+
+// App state
+let currentObject = null;
+let currentKorpuses = [];
+let selectedKorpuses = new Set();
+
+async function initApp(){
+  showApp();
+  const user = await api('/api/me');
+  document.getElementById('userName').textContent = user.username;
+  const adminBadge = document.getElementById('adminBadge');
+  const adminCard = document.getElementById('adminCard');
+  if (user.is_admin){
+    adminBadge.style.display='inline';
+    adminCard.style.display='block';
+    document.getElementById('adminUserSection').style.display='block';
+    loadUsers();
+  } else {
+    adminBadge.style.display='none';
+    adminCard.style.display='none';
+  }
+  document.getElementById('selectedObject').textContent = '—';
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('korpusCard').style.display = 'none';
+  currentObject = null;
+  document.getElementById('searchInput').value = '';
+  document.getElementById('objectList').innerHTML = '<div class="empty-state">Начните ввод для поиска</div>';
+  document.getElementById('searchInput').focus();
+}
+
+async function loadUsers(){
+  try {
+    const users = await api('/api/users');
+    document.getElementById('userList').innerHTML = users.map(u =>
+      '<span style="display:inline-block;margin:2px 6px 2px 0;background:#f0f0f0;padding:2px 8px;border-radius:4px">' +
+      u.username + (u.is_admin ? ' 👑' : '') + '</span>'
+    ).join('');
+  } catch(e){}
+}
+document.getElementById('addUserBtn').addEventListener('click', async ()=>{
+  const user = document.getElementById('newUser').value.trim();
+  const pass = document.getElementById('newPass').value;
+  if (!user || !pass){ toast('Введите логин и пароль'); return; }
+  try {
+    await api('/api/users', { method:'POST', body:JSON.stringify({username:user, password:pass}) });
+    toast('Пользователь создан');
+    document.getElementById('newUser').value=''; document.getElementById('newPass').value='';
+    loadUsers();
+  } catch(e){ toast(e.message); }
+});
+
+// Search objects
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input', function(){
+  clearTimeout(searchTimer);
+  const q = this.value.trim();
+  searchTimer = setTimeout(()=>searchObjects(q), 300);
+});
+
+async function searchObjects(q){
+  const list = document.getElementById('objectList');
+  if (!q){ list.innerHTML = '<div class="empty-state">Начните ввод для поиска</div>'; return; }
+  list.innerHTML = '<div class="loading">Поиск...</div>';
+  try {
+    const res = await api('/api/objects?q='+encodeURIComponent(q));
+    if (!res.objects.length){
+      list.innerHTML = '<div class="empty-state">Ничего не найдено</div>'; return;
+    }
+    list.innerHTML = res.objects.map(o =>
+      '<div class="object-item" data-id="'+o.id+'" data-name="'+o.name.replace(/"/g,'&quot;')+'">' +
+      '<div class="obj-name">'+o.name+'</div>' +
+      '<div class="obj-id">'+o.id+'</div></div>'
+    ).join('');
+
+    if (currentObject){
+      const active = list.querySelector('[data-id="'+currentObject+'"]');
+      if (active) active.classList.add('active');
+    }
+  } catch(e){ list.innerHTML = '<div class="empty-state">Ошибка: '+e.message+'</div>'; }
+}
+
+document.getElementById('objectList').addEventListener('click', function(e){
+  const item = e.target.closest('.object-item');
+  if (!item) return;
+  selectObject(item.dataset.id, item.dataset.name);
+});
+
+async function selectObject(id, name){
+  currentObject = id;
+  document.querySelectorAll('.object-item').forEach(el=>el.classList.remove('active'));
+  const el = document.querySelector('.object-item[data-id="'+id+'"]');
+  if (el) el.classList.add('active');
+  document.getElementById('selectedObject').innerHTML = name + ' (' + id + ')';
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('korpusCard').style.display = 'block';
+  document.getElementById('korpusList').innerHTML = '<div class="loading">Загрузка...</div>';
+  selectedKorpuses = new Set();
+  try {
+    const res = await api('/api/objects/'+encodeURIComponent(id)+'/korpuses');
+    currentKorpuses = res.korpuses;
+    if (!res.korpuses.length){
+      document.getElementById('korpusList').innerHTML = '<div class="empty-state">Нет корпусов</div>';
+      document.getElementById('generateBtn').disabled = false;
+      return;
+    }
+    document.getElementById('korpusList').innerHTML = res.korpuses.map(k =>
+      '<label class="korpus-item"><input type="checkbox" value="'+k+'" onchange="toggleKorpus(this)"> '+k+'</label>'
+    ).join('');
+    document.getElementById('selectAllKorpus').onclick = ()=>{
+      document.querySelectorAll('#korpusList input[type=checkbox]').forEach(cb=>{cb.checked=true; selectedKorpuses.add(cb.value)});
+      document.getElementById('generateBtn').disabled = false;
+    };
+    document.getElementById('deselectAllKorpus').onclick = ()=>{
+      document.querySelectorAll('#korpusList input[type=checkbox]').forEach(cb=>{cb.checked=false});
+      selectedKorpuses.clear();
+      document.getElementById('generateBtn').disabled = true;
+    };
+  } catch(e){
+    document.getElementById('korpusList').innerHTML = '<div class="empty-state">Ошибка: '+e.message+'</div>';
+  }
+}
+
+function toggleKorpus(cb){
+  if (cb.checked) selectedKorpuses.add(cb.value);
+  else selectedKorpuses.delete(cb.value);
+  document.getElementById('generateBtn').disabled = selectedKorpuses.size === 0;
+}
+
+// Generate Excel
+document.getElementById('generateBtn').addEventListener('click', async function(){
+  if (!currentObject) return;
+  this.disabled = true; this.textContent = '⏳ Генерация...';
+  try {
+    const korps = [...selectedKorpuses];
+    const body = { object_id: currentObject };
+    if (korps.length) body.korpuses = korps;
+    const sec = document.getElementById('sectionInput').value.trim();
+    if (sec) body.section = sec;
+    const start = document.getElementById('startDate').value;
+    if (start) body.start_date = start;
+    const end = document.getElementById('endDate').value;
+    if (end) body.end_date = end;
+
+    // Fetch as blob for download
+    const token = getToken();
+    const res = await fetch(API + '/api/generate-excel', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify(body),
+    });
+    if (res.status===401){ clearToken(); showLogin(); return; }
+    if (!res.ok){
+      const body = await res.json().catch(()=>({}));
+      throw new Error(body.detail || 'Ошибка');
+    }
+    const blob = await res.blob();
+    const disp = res.headers.get('content-disposition')||'';
+    const match = disp.match(/filename="?(.+?)"?$/);
+    const filename = match ? match[1] : 'grafik_vitrazhey.xlsx';
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('График сформирован: ' + filename);
+  } catch(e){ toast('Ошибка: '+e.message); }
+  finally { this.disabled = false; this.textContent = '📥 Сформировать Excel'; }
+});
+
+// Admin update
+document.getElementById('updateBtn').addEventListener('click', async function(){
+  this.disabled = true; this.textContent = '⏳ Обновление...';
+  try {
+    const res = await api('/api/update', { method:'POST' });
+    toast(res.message || 'Данные обновлены');
+  } catch(e){ toast('Ошибка: '+e.message); }
+  finally { this.disabled = false; this.textContent = '🔄 Обновить данные из ELMA'; }
+});
+
+// Init: check token on load
+(async function(){
+  if (getToken()){
+    try { await initApp(); } catch(e){ showLogin(); }
+  } else { showLogin(); }
+})();
+</script>
+</body>
+</html>

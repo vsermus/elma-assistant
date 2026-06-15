@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конструктор Дашбордов ELMA</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <h2>Настройки</h2>
+            <div id="entity-selection">
+                <!-- Entities and metrics will be loaded here -->
+            </div>
+            <div class="sidebar-footer">
+                <button id="btn-update" class="btn-update">🔄 Обновить данные из ELMA</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>Конструктор Дашборда</h1>
+                <div id="update-status" class="status-indicator">Готов</div>
+            </header>
+
+            <div id="dashboard-grid" class="dashboard-grid">
+                <!-- Charts and tables will be rendered here -->
+                <div class="empty-state">
+ la Выберите сущности и метрики в боковом меню, чтобы начать построение отчета</div>
+            </div>
+        </main>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+</html>

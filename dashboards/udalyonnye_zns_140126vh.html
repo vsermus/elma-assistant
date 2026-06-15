@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Удалённые ЗНС — 140126ВХ</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f5f6fa;
+    color: #2c3e50;
+    padding: 20px;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .header {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    padding: 24px 28px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+  }
+  .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .header .subtitle { font-size: 14px; opacity: 0.9; }
+  .header .subtitle span { display: inline-block; margin-right: 20px; }
+  .info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .info-card {
+    background: white;
+    border-radius: 10px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .info-card .label { font-size: 12px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .info-card .value { font-size: 20px; font-weight: 700; color: #2c3e50; }
+  .info-card .value.red { color: #e74c3c; }
+  .info-card .value.small { font-size: 14px; font-weight: 500; }
+  .table-wrap {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead {
+    background: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+  }
+  th {
+    text-align: left;
+    padding: 14px 16px;
+    font-weight: 600;
+    color: #495057;
+    white-space: nowrap;
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  tr:hover { background: #f8f9fa; }
+  .section-group td:first-child {
+    border-left: 3px solid #e74c3c;
+  }
+  .footer {
+    margin-top: 16px;
+    text-align: center;
+    color: #95a5a6;
+    font-size: 12px;
+  }
+  @media (max-width: 768px) {
+    table, thead, tbody, th, td, tr { display: block; }
+    thead tr { display: none; }
+    td {
+      padding: 10px 14px;
+      position: relative;
+      padding-left: 50%;
+    }
+    td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 14px;
+      width: 45%;
+      font-weight: 600;
+      color: #7f8c8d;
+      font-size: 12px;
+    }
+    tr { margin-bottom: 8px; border: 1px solid #eee; border-radius: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🗑️ Удалённые ЗНС по объекту 140126ВХ</h1>
+    <div class="subtitle">
+      <span>🏗️ Корпус 2</span>
+      <span>📅 Дата удаления: 27.04.2026</span>
+      <span>👤 Автор: Калиновский Евгений Эдуардович</span>
+    </div>
+  </div>
+
+  <div class="info-cards">
+    <div class="info-card">
+      <div class="label">Всего удалено</div>
+      <div class="value red">26</div>
+    </div>
+    <div class="info-card">
+      <div class="label">Общий метраж, м²</div>
+      <div class="value">649.43</div>
+    </div>
+    <div class="info-card">
+      <div class="label">Автор удаления</div>
+      <div class="value small">Калиновский Евгений Эдуардович</div>
+    </div>
+    <div class="info-card">
+      <div class="label">Объект</div>
+      <div class="value small">140126ВХ — ЖК Янила Форест (уч.13 корп.2)</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Корпус</th>
+          <th>Секция</th>
+          <th>Витраж</th>
+          <th>Тип заполнения</th>
+          <th>Характеристика</th>
+          <th>Метраж, м²</th>
+          <th>Дата удаления</th>
+        </tr>
+      </thead>
+      <tbody>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вбал-1</td>
+      <td data-label="Тип заполнения">Заполнение (5зак) створки</td>
+      <td data-label="Характеристика">5М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">32.65</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вбал-1</td>
+      <td data-label="Тип заполнения">Заполнение (5 мм)</td>
+      <td data-label="Характеристика">5М1</td>
+      <td data-label="Метраж, м²">25.66</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вбал-1</td>
+      <td data-label="Тип заполнения">Заполнение (5 зак)</td>
+      <td data-label="Характеристика">5М1 зак.</td>
+      <td data-label="Метраж, м²">45.92</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-1</td>
+      <td data-label="Тип заполнения">Заполнение (5зак) створки</td>
+      <td data-label="Характеристика">5М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">20.99</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-1</td>
+      <td data-label="Тип заполнения">Заполнение (5 зак)</td>
+      <td data-label="Характеристика">5М1 зак.</td>
+      <td data-label="Метраж, м²">21.44</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-1</td>
+      <td data-label="Тип заполнения">СМЛ</td>
+      <td data-label="Характеристика">СМЛ 8мм RAL 095 90 20</td>
+      <td data-label="Метраж, м²">15.16</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-1</td>
+      <td data-label="Тип заполнения">СМЛ</td>
+      <td data-label="Характеристика">СМЛ 8мм NCS S 5010-B10G</td>
+      <td data-label="Метраж, м²">6.06</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-1</td>
+      <td data-label="Тип заполнения">Заполнение (5зак) створки</td>
+      <td data-label="Характеристика">5М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">20.99</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-1</td>
+      <td data-label="Тип заполнения">Заполнение (5 зак)</td>
+      <td data-label="Характеристика">5М1 зак.</td>
+      <td data-label="Метраж, м²">21.44</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-2</td>
+      <td data-label="Тип заполнения">Заполнение (5зак) створки</td>
+      <td data-label="Характеристика">5М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">13.37</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-2</td>
+      <td data-label="Тип заполнения">Заполнение (6зак) створки</td>
+      <td data-label="Характеристика">6М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">13.64</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-2</td>
+      <td data-label="Тип заполнения">Заполнение (5 зак)</td>
+      <td data-label="Характеристика">5М1 зак.</td>
+      <td data-label="Метраж, м²">57.95</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-3</td>
+      <td data-label="Тип заполнения">Заполнение (5зак) створки</td>
+      <td data-label="Характеристика">5М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">18.00</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-3</td>
+      <td data-label="Тип заполнения">Заполнение (5 мм)</td>
+      <td data-label="Характеристика">5мм М1</td>
+      <td data-label="Метраж, м²">6.10</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">1</td>
+      <td data-label="Витраж">Вл-3</td>
+      <td data-label="Тип заполнения">Заполнение (5 зак)</td>
+      <td data-label="Характеристика">5М1 зак.</td>
+      <td data-label="Метраж, м²">25.18</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">2</td>
+      <td data-label="Витраж">Вбал-2</td>
+      <td data-label="Тип заполнения">Заполнение (5зак) створки</td>
+      <td data-label="Характеристика">5М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">40.64</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">2</td>
+      <td data-label="Витраж">Вбал-2</td>
+      <td data-label="Тип заполнения">Заполнение (5 мм)</td>
+      <td data-label="Характеристика">5М1</td>
+      <td data-label="Метраж, м²">31.22</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">2</td>
+      <td data-label="Витраж">Вбал-2</td>
+      <td data-label="Тип заполнения">Заполнение (5 зак)</td>
+      <td data-label="Характеристика">5М1 зак.</td>
+      <td data-label="Метраж, м²">56.88</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">2</td>
+      <td data-label="Витраж">Вл-4</td>
+      <td data-label="Тип заполнения">Заполнение (5зак) створки</td>
+      <td data-label="Характеристика">5М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">9.44</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">2</td>
+      <td data-label="Витраж">Вл-4</td>
+      <td data-label="Тип заполнения">Заполнение (6зак) створки</td>
+      <td data-label="Характеристика">6М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">14.45</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">2</td>
+      <td data-label="Витраж">Вл-4</td>
+      <td data-label="Тип заполнения">Заполнение (5 зак)</td>
+      <td data-label="Характеристика">5М1 зак.</td>
+      <td data-label="Метраж, м²">35.08</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">2</td>
+      <td data-label="Витраж">Вл-5</td>
+      <td data-label="Тип заполнения">Заполнение (5зак) створки</td>
+      <td data-label="Характеристика">5М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">25.24</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">2</td>
+      <td data-label="Витраж">Вл-5</td>
+      <td data-label="Тип заполнения">Заполнение (5 зак)</td>
+      <td data-label="Характеристика">5М1 зак.</td>
+      <td data-label="Метраж, м²">33.25</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">2</td>
+      <td data-label="Витраж">Вл-6</td>
+      <td data-label="Тип заполнения">Заполнение (5зак) створки</td>
+      <td data-label="Характеристика">5М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">9.44</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">2</td>
+      <td data-label="Витраж">Вл-6</td>
+      <td data-label="Тип заполнения">Заполнение (6зак) створки</td>
+      <td data-label="Характеристика">6М1 зак. (створка)</td>
+      <td data-label="Метраж, м²">14.45</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+    <tr>
+      <td data-label="Корпус">2</td>
+      <td data-label="Секция">2</td>
+      <td data-label="Витраж">Вл-6</td>
+      <td data-label="Тип заполнения">Заполнение (5 зак)</td>
+      <td data-label="Характеристика">5М1 зак.</td>
+      <td data-label="Метраж, м²">34.79</td>
+      <td data-label="Дата удаления">2026-04-27 12:50:12</td>
+    </tr>
+  </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    140126ВХ · ЖК «Янила Форест» (уч.13 корп. 2) · Данные на 27.04.2026
+  </div>
+</div>
+</body>
+</html>
