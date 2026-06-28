@@ -165,5 +165,5 @@ ELMA_Connector/
 
 ## Автор
 
-**Виктор Ермус** — аналитик данных  
+**Виктор Сермус** — аналитик данных  
 GitHub: [vsermus](https://github.com/vsermus)
